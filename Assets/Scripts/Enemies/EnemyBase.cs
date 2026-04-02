@@ -11,7 +11,7 @@ using UnityEngine.UI;
 ///   血条为场景根节点对象（不是敌人子节点），避免跟随敌人 localScale 翻转/缩放。
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
-public abstract class EnemyBase : Damageable
+public abstract class EnemyBase : Damageable, IEnemyTypeProvider
 {
     // ─── 移动 ───────────────────────────────────────────────────────────
     [Header("Movement")]
@@ -25,6 +25,7 @@ public abstract class EnemyBase : Damageable
     public LayerMask playerLayer;
     public int  contactDamage  = 1;
     public float attackInterval = 1f;
+    public string enemyTypeId = "Enemy";
 
     // ─── 血条 ────────────────────────────────────────────────────────────
     [Header("Health Bar")]
@@ -52,6 +53,7 @@ public abstract class EnemyBase : Damageable
 
     // 血条引用
     protected HealthBarCanvas healthBar;
+    protected CombatContext lastDamageContext;
 
     // 缓存包围盒信息（在 Start 里读取，此时 localScale 已应用）
     private float _spriteHalfHeight = 0.5f;  // 敌人包围盒半高（世界单位）
@@ -195,9 +197,16 @@ public abstract class EnemyBase : Damageable
     }
 
     // ─── 受伤覆写：更新血条 ──────────────────────────────────────────────
-    public override void TakeDamage(int amount)
+    public override void TakeDamage(int amount, GameObject attacker = null)
     {
-        base.TakeDamage(amount);
+        var ctx = CombatContext.Create(attacker, gameObject, amount, DamageType.Melee);
+        TakeDamage(ctx, attacker);
+    }
+
+    public override void TakeDamage(CombatContext ctx, GameObject attacker = null)
+    {
+        lastDamageContext = ctx;
+        base.TakeDamage(ctx, attacker);
         if (anim != null && !invulnerable) anim.SetTrigger(ANIM_HIT);
         if (healthBar != null) healthBar.UpdateBar(currentHealth, maxHealth);
     }
@@ -205,6 +214,7 @@ public abstract class EnemyBase : Damageable
     // ─── 死亡时销毁血条 ──────────────────────────────────────────────────
     protected override void Die()
     {
+        BattleEvents.RaiseEnemyDied(gameObject, lastDamageContext);
         if (healthBar != null) Destroy(healthBar.gameObject);
         base.Die();
     }
@@ -251,5 +261,10 @@ public abstract class EnemyBase : Damageable
         Gizmos.DrawLine(
             new Vector3(transform.position.x - _spriteWidth * 0.5f, topY, 0),
             new Vector3(transform.position.x + _spriteWidth * 0.5f, topY, 0));
+    }
+
+    public virtual string GetEnemyTypeId()
+    {
+        return string.IsNullOrEmpty(enemyTypeId) ? gameObject.tag : enemyTypeId;
     }
 }

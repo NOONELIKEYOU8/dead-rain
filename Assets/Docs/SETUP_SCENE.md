@@ -65,11 +65,11 @@
 - 若希望手柄支持或更复杂输入，可考虑切换到新 Input System（需在 `Packages/manifest.json` 添加 `com.unity.inputsystem`）。
 
 已添加的脚本文件
-- [Assets/Scripts/PlayerController.cs](Assets/Scripts/PlayerController.cs#L1)
-- [Assets/Scripts/Damageable.cs](Assets/Scripts/Damageable.cs#L1)
-- [Assets/Scripts/SimpleEnemy.cs](Assets/Scripts/SimpleEnemy.cs#L1) ← 保留原版，不受影响
-- [Assets/Scripts/CameraFollow.cs](Assets/Scripts/CameraFollow.cs#L1)
-- [Assets/Scripts/GameManager.cs](Assets/Scripts/GameManager.cs#L1)
+- [Assets/Scripts/Player/PlayerController.cs](Assets/Scripts/Player/PlayerController.cs#L1)
+- [Assets/Scripts/Core/Damageable.cs](Assets/Scripts/Core/Damageable.cs#L1)
+- [Assets/Scripts/Enemies/SimpleEnemy.cs](Assets/Scripts/Enemies/SimpleEnemy.cs#L1) ← 保留原版，不受影响
+- [Assets/Scripts/Systems/CameraFollow.cs](Assets/Scripts/Systems/CameraFollow.cs#L1)
+- [Assets/Scripts/Core/GameManager.cs](Assets/Scripts/Core/GameManager.cs#L1)
 
 新 Enemy 系统（小怪 + Boss）
 ---
@@ -77,10 +77,10 @@
 
 | 脚本 | 说明 |
 |------|------|
-| `Assets/Scripts/EnemyBase.cs` | 抽象基类：通用 AI（巡逻/追踪/接触伤害）、血条、动画触发 |
-| `Assets/Scripts/MinionEnemy.cs` | 小怪：继承 EnemyBase，体型 1×1，血量 3，伤害 1 |
-| `Assets/Scripts/BossEnemy.cs`  | Boss：继承 EnemyBase，体型 1.8×1.8，血量 20，伤害 3，额外冲刺攻击 |
-| `Assets/Scripts/HealthBarCanvas.cs` | World-Space Canvas 血条，自动颜色渐变（绿→黄→红） |
+| `Assets/Scripts/Enemies/EnemyBase.cs` | 抽象基类：通用 AI（巡逻/追踪/接触伤害）、血条、动画触发 |
+| `Assets/Scripts/Enemies/MinionEnemy.cs` | 小怪：继承 EnemyBase，体型 1×1，血量 3，伤害 1 |
+| `Assets/Scripts/Enemies/BossEnemy.cs`  | Boss：继承 EnemyBase，体型 1.8×1.8，血量 20，伤害 3，额外冲刺攻击 |
+| `Assets/Scripts/UI/HealthBarCanvas.cs` | World-Space Canvas 血条，自动颜色渐变（绿→黄→红） |
 | `Assets/Editor/GenerateEnemyAssets.cs` | 编辑器工具：一键生成占位 Sprite / AnimatorController / Prefab |
 
 ### 快速上手

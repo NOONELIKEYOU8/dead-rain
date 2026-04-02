@@ -15,6 +15,15 @@ public class MinionEnemy : EnemyBase
     [Tooltip("小怪基础移动速度，略快于Boss")]
     public float minionPatrolSpeed = 2.0f;
 
+    [Header("Minion Strike")]
+    [Tooltip("开启后使用主动近战攻击，而不是纯接触伤害")]
+    public bool useActiveStrike = true;
+    public float strikeRange = 1.1f;
+    public int strikeDamage = 1;
+    public float strikeCooldown = 1.1f;
+
+    private float nextStrikeTime;
+
     protected override void Awake()
     {
         // 先让基类初始化（rb、anim、healthBar 等）
@@ -24,6 +33,12 @@ public class MinionEnemy : EnemyBase
         patrolSpeed   = minionPatrolSpeed;
         maxHealth     = Mathf.Max(maxHealth, 1);   // 保留 Inspector 设定，否则默认 3
         contactDamage = Mathf.Max(contactDamage, 1);
+
+        if (useActiveStrike)
+        {
+            // 首版基线：启用主动攻击时，避免与接触伤害叠加。
+            contactDamage = 0;
+        }
 
         // 小怪体型：保持 1×1 比例（不修改 localScale，让 Prefab 决定）
         // 也可在此强制：transform.localScale = new Vector3(1f, 1f, 1f);
@@ -38,13 +53,19 @@ public class MinionEnemy : EnemyBase
     protected override void Update()
     {
         base.Update();
-        // 如需小怪专属 Update 逻辑，在此添加
+        if (useActiveStrike) TryStrike();
     }
 
     // ─── 受伤：可覆写以添加小怪专属效果 ────────────────────────────────
-    public override void TakeDamage(int amount)
+    public override void TakeDamage(int amount, GameObject attacker = null)
     {
-        base.TakeDamage(amount);
+        base.TakeDamage(amount, attacker);
+        // 例如：播放受击音效 / 特效（留给后续扩展）
+    }
+
+    public override void TakeDamage(CombatContext ctx, GameObject attacker = null)
+    {
+        base.TakeDamage(ctx, attacker);
         // 例如：播放受击音效 / 特效（留给后续扩展）
     }
 
@@ -53,5 +74,34 @@ public class MinionEnemy : EnemyBase
     {
         // 后续可在此添加掉落物、经验值、特效等
         base.Die();
+    }
+
+    private void TryStrike()
+    {
+        if (player == null) return;
+        if (Time.time < nextStrikeTime) return;
+
+        float distance = Vector2.Distance(transform.position, player.position);
+        if (distance > strikeRange) return;
+
+        var targetDamageable = player.GetComponent<Damageable>();
+        if (targetDamageable == null) return;
+
+        var ctx = CombatContext.Create(gameObject, targetDamageable.gameObject, strikeDamage, DamageType.Melee);
+        BattleEvents.RaiseAttackStarted(ctx);
+        targetDamageable.TakeDamage(ctx, gameObject);
+        BattleEvents.RaiseAttackResolved(ctx);
+
+        if (anim != null) anim.SetTrigger(ANIM_ATTACK);
+        nextStrikeTime = Time.time + strikeCooldown;
+    }
+
+    protected override void OnDrawGizmosSelected()
+    {
+        base.OnDrawGizmosSelected();
+        if (!useActiveStrike) return;
+
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, strikeRange);
     }
 }

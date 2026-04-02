@@ -104,9 +104,15 @@ public class BossEnemy : EnemyBase
     }
 
     // ─── 受伤：Boss 专属反馈 ────────────────────────────────────────────
-    public override void TakeDamage(int amount)
+    public override void TakeDamage(int amount, GameObject attacker = null)
     {
-        base.TakeDamage(amount);
+        base.TakeDamage(amount, attacker);
+        // 后续可在此触发摄像机震动、全屏闪光等
+    }
+
+    public override void TakeDamage(CombatContext ctx, GameObject attacker = null)
+    {
+        base.TakeDamage(ctx, attacker);
         // 后续可在此触发摄像机震动、全屏闪光等
     }
 
