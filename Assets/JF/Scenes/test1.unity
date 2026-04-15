@@ -459,7 +459,6 @@ MonoBehaviour:
   defaultWeaponIndex: 0
   switchKey: 112
   attackKey: 106
-  weaponSpawnPoint: {fileID: 0}
 --- !u!1001 &3125354376395078474
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -537,6 +536,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1068708312034216350, guid: e8a80dde2dc2afd4596d23c8bf6b57f0, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
     - target: {fileID: 1068708312034216350, guid: e8a80dde2dc2afd4596d23c8bf6b57f0, type: 3}
       propertyPath: m_Name
       value: Player
