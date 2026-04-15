@@ -274,9 +274,15 @@ public class PlayerController : Damageable
         else
         {
             if (rb.velocity.y > 0)
+            {
                 currentState = State.Jump;
+                if (anim != null) anim.Play("Jump");
+            }
             else
+            {
                 currentState = State.Fall;
+                if (anim != null) anim.Play("Fall");
+            }
         }
 
         // 翻转图片
@@ -374,6 +380,8 @@ public class PlayerController : Damageable
             currentState = State.Attack;
             primaryCooldownCounter = primaryCooldown;
             attackTimeCounter = attackDuration;
+            
+            if (anim != null) anim.Play("Attack");
             
             // 简单检测伤害
             Vector2 center = attackPoint != null ? (Vector2)attackPoint.position : (Vector2)transform.position;
