@@ -26,25 +26,19 @@ public class PlayerWeaponManager : MonoBehaviour
     [SerializeField] private List<WeaponSlot> weaponSlots = new List<WeaponSlot>();
     [SerializeField] private int defaultWeaponIndex = 0;
 
-    [Header("Input")]
+    [Header("Input")] // 在面板显示标题：Input
     [SerializeField] private KeyCode switchKey = KeyCode.P;
     [SerializeField] private KeyCode attackKey = KeyCode.J;
-
-    [Header("Spawn")]
-    [SerializeField] private Transform weaponSpawnPoint;
 
     private int currentWeaponIndex = -1;
     private Weapon currentWeaponInstance;
     private Collider2D[] playerColliders;
+    private Transform ownerTransform;
 
     private void Awake()
     {
-        playerColliders = GetComponentsInChildren<Collider2D>(true);
-
-        if (weaponSpawnPoint == null)
-        {
-            weaponSpawnPoint = transform;
-        }
+        ownerTransform = transform.root != null ? transform.root : transform;
+        playerColliders = ownerTransform.GetComponentsInChildren<Collider2D>(true);
 
         if (weaponSlots.Count > 0)
         {
@@ -147,36 +141,25 @@ public class PlayerWeaponManager : MonoBehaviour
             return;
         }
 
-        Vector3 spawnPos = weaponSpawnPoint != null ? weaponSpawnPoint.position : transform.position;
-        Quaternion spawnRot = weaponSpawnPoint != null ? weaponSpawnPoint.rotation : Quaternion.identity;
+        Transform parentForWeapon = ownerTransform != null ? ownerTransform : transform;
+        Vector3 spawnPos = parentForWeapon.position;
+        Quaternion spawnRot = parentForWeapon.rotation;
 
         currentWeaponInstance = Instantiate(slot.weaponPrefab, spawnPos, spawnRot);
-        currentWeaponInstance.transform.SetParent(weaponSpawnPoint, false);
+        currentWeaponInstance.transform.SetParent(parentForWeapon, false);
         currentWeaponInstance.transform.localPosition = Vector3.zero;
         currentWeaponInstance.transform.localRotation = Quaternion.identity;
         currentWeaponInstance.OnUse(gameObject);
 
         if (currentWeaponInstance is Bomb bomb)
         {
-            bomb.SetHeldState(true, weaponSpawnPoint);
+            bomb.SetHeldState(true, parentForWeapon);
             SetIgnoreCollisionWithPlayer(bomb, true);
         }
 
-        ApplyLocalPositionOffset(currentWeaponInstance.transform, slot.localPositionOffset);
-    }
-
-    private void ApplyLocalPositionOffset(Transform weaponTransform, Vector3 localOffset)
-    {
-        if (weaponTransform == null)
-        {
-            return;
-        }
-
-        // 角色朝左时镜像 X 偏移，保证同一配置在左右朝向都合理。
-        float facing = transform.localScale.x >= 0f ? 1f : -1f;
-        Vector3 finalOffset = localOffset;
-        finalOffset.x *= facing;
-        weaponTransform.localPosition = finalOffset;
+        // 先让 Bomb 完成手持状态初始化，再应用配置偏移。
+        // 偏移不再手动镜像，直接依赖父节点翻转来决定左右。
+        currentWeaponInstance.transform.localPosition = slot.localPositionOffset;
     }
 
     private void SetIgnoreCollisionWithPlayer(Bomb bomb, bool ignore)

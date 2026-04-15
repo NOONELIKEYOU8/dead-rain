@@ -188,8 +188,7 @@ MonoBehaviour:
   description: 
   damage: 10
   attackRange: 1.5
-  explosionRadius: 5
-  explosionDamageMultiplier: 1.5
+  explosionRadius: 0.8
   explosionEffectPrefab: {fileID: 0}
   throwForce: 10
   isFlyingParam: isFlying

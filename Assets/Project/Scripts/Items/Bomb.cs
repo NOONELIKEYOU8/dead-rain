@@ -25,19 +25,7 @@ public class Bomb : Weapon
     /// 爆炸的范围（米），在此范围内的敌人都会受到伤害
     /// </summary>
     [SerializeField]
-    protected float explosionRadius = 5f;
-
-    /// <summary>
-    /// 爆炸造成的伤害加成倍率，最终伤害 = damage * explosionDamageMultiplier
-    /// </summary>
-    [SerializeField]
-    protected float explosionDamageMultiplier = 1.5f;
-
-    /// <summary>
-    /// 爆炸视觉效果的预制体
-    /// </summary>
-    [SerializeField]
-    protected GameObject explosionEffectPrefab;
+    protected float explosionRadius = 2f;
 
     /// <summary>
     /// 投掷力度
@@ -100,7 +88,7 @@ public class Bomb : Weapon
     /// </summary>
     private bool hasExploded = false;
 
-    public int ExplosionDamage => Mathf.RoundToInt(damage * explosionDamageMultiplier);
+    public int ExplosionDamage => damage;
 
     /// <summary>
     /// 初始化组件
@@ -282,13 +270,6 @@ public class Bomb : Weapon
         // 这符合你说的：“Throw 动画播放完之后就立刻造成伤害”
         DealExplosionDamage(explosionPosition);
 
-        // 如果你还保留了独立爆炸特效 prefab，这里一起生成
-        // 这不是必须的，如果你只想用 Bomb 自己的 Explosion 动画，也可以不配 prefab
-        if (explosionEffectPrefab != null)
-        {
-            Instantiate(explosionEffectPrefab, explosionPosition, Quaternion.identity);
-        }
-
         // 通知 Animator 进入 Explosion 动画状态
         if (animator != null)
         {
@@ -364,7 +345,8 @@ public class Bomb : Weapon
     /// </summary>
     public override bool Attack(GameObject attacker)
     {
-        float facing = attacker.transform.localScale.x >= 0f ? 1f : -1f;
+        // 使用 lossyScale 兼容角色翻转发生在父节点时的朝向读取。
+        float facing = attacker.transform.lossyScale.x >= 0f ? 1f : -1f;
         Vector2 direction = new Vector2(facing, 0.5f).normalized;
         ThrowBomb(direction);
         return true;
@@ -376,9 +358,9 @@ public class Bomb : Weapon
     /// </summary>
     protected override void OnDrawGizmosSelected()
     {
-        base.OnDrawGizmosSelected();
+        // base.OnDrawGizmosSelected();
 
-        Gizmos.color = Color.red;
+        Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, explosionRadius);
     }
 }
