@@ -17,6 +17,9 @@ public class PlayerWeaponManager : MonoBehaviour
 
         [Tooltip("当前槽位对应的武器预制体")]
         public Weapon weaponPrefab;
+
+        [Tooltip("武器相对挂点的初始位置偏移（朝右时生效，朝左会自动镜像X）")]
+        public Vector3 localPositionOffset = Vector3.zero;
     }
 
     [Header("Weapon Slots")]
@@ -107,7 +110,7 @@ public class PlayerWeaponManager : MonoBehaviour
         if (currentWeaponInstance is Bomb bomb)
         {
             bomb.SetHeldState(false, null);
-            SetIgnoreCollisionWithPlayer(bomb, true);
+            SetIgnoreCollisionWithPlayer(bomb, false);
         }
 
         bool success = currentWeaponInstance.Attack(gameObject);
@@ -129,6 +132,8 @@ public class PlayerWeaponManager : MonoBehaviour
         SpawnCurrentWeaponInstance();
     }
 
+
+    /// 生成当前武器实例并设置父对象
     private void SpawnCurrentWeaponInstance()
     {
         if (!IsValidIndex(currentWeaponIndex))
@@ -156,6 +161,22 @@ public class PlayerWeaponManager : MonoBehaviour
             bomb.SetHeldState(true, weaponSpawnPoint);
             SetIgnoreCollisionWithPlayer(bomb, true);
         }
+
+        ApplyLocalPositionOffset(currentWeaponInstance.transform, slot.localPositionOffset);
+    }
+
+    private void ApplyLocalPositionOffset(Transform weaponTransform, Vector3 localOffset)
+    {
+        if (weaponTransform == null)
+        {
+            return;
+        }
+
+        // 角色朝左时镜像 X 偏移，保证同一配置在左右朝向都合理。
+        float facing = transform.localScale.x >= 0f ? 1f : -1f;
+        Vector3 finalOffset = localOffset;
+        finalOffset.x *= facing;
+        weaponTransform.localPosition = finalOffset;
     }
 
     private void SetIgnoreCollisionWithPlayer(Bomb bomb, bool ignore)

@@ -76,7 +76,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 714136340, guid: dcf5dde2332ce55409d9a92aa105d91c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -189,7 +189,6 @@ MonoBehaviour:
   damage: 10
   attackRange: 1.5
   explosionRadius: 5
-  explosionDelay: 2
   explosionDamageMultiplier: 1.5
   explosionEffectPrefab: {fileID: 0}
   throwForce: 10
