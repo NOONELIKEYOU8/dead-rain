@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 /// <summary>
 /// 炸弹类
-/// 继承自 ExplosionWeapon，负责实现：
+/// 继承自 Weapon，负责实现：
 /// 1. 闲置状态（Idle）
 /// 2. 被投掷后的飞行动画（Throw）
 /// 3. 爆炸动画（Explosion）
@@ -20,8 +19,32 @@ using System.Collections;
 ///     -> Explosion 动画播完（由动画事件通知）
 ///     -> 销毁炸弹对象
 /// </summary>
-public class Bomb : ExplosionWeapon
+public class Bomb : Weapon
 {
+    /// <summary>
+    /// 爆炸的范围（米），在此范围内的敌人都会受到伤害
+    /// </summary>
+    [SerializeField]
+    protected float explosionRadius = 5f;
+
+    /// <summary>
+    /// 爆炸造成的伤害加成倍率，最终伤害 = damage * explosionDamageMultiplier
+    /// </summary>
+    [SerializeField]
+    protected float explosionDamageMultiplier = 1.5f;
+
+    /// <summary>
+    /// 爆炸视觉效果的预制体
+    /// </summary>
+    [SerializeField]
+    protected GameObject explosionEffectPrefab;
+
+    /// <summary>
+    /// 投掷力度
+    /// </summary>
+    [SerializeField]
+    protected float throwForce = 10f;
+
     /// <summary>
     /// 炸弹的 2D 刚体组件
     /// 用于控制飞行速度、重力、旋转等物理行为
@@ -33,12 +56,6 @@ public class Bomb : ExplosionWeapon
     /// 爆炸后通常会关闭，避免继续参与碰撞
     /// </summary>
     protected Collider2D bombCollider;
-
-    /// <summary>
-    /// 炸弹的精灵渲染器
-    /// 如果后面你想做闪烁、隐藏等效果，可以用到它
-    /// </summary>
-    protected SpriteRenderer spriteRenderer;
 
     /// <summary>
     /// Animator 组件
@@ -83,11 +100,7 @@ public class Bomb : ExplosionWeapon
     /// </summary>
     private bool hasExploded = false;
 
-    /// <summary>
-    /// 对外暴露投掷力度，只读
-    /// 值来自父类 ExplosionWeapon 的 throwForce
-    /// </summary>
-    public float ThrowForce => throwForce;
+    public int ExplosionDamage => Mathf.RoundToInt(damage * explosionDamageMultiplier);
 
     /// <summary>
     /// 初始化组件
@@ -98,14 +111,8 @@ public class Bomb : ExplosionWeapon
         // 获取现有组件
         bombRigidbody = GetComponent<Rigidbody2D>();
         bombCollider = GetComponent<Collider2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
 
-        // 如果场景中没挂 Rigidbody2D，就自动补一个，避免报错
-        if (bombRigidbody == null)
-        {
-            bombRigidbody = gameObject.AddComponent<Rigidbody2D>();
-        }
 
         // 设置基础物理参数
         // 这些参数决定炸弹飞行时的手感
@@ -138,12 +145,22 @@ public class Bomb : ExplosionWeapon
     /// 爆炸时机由 Throw 动画最后一帧的 Animation Event 决定
     /// </summary>
     /// <param name="direction">投掷方向</param>
-    public override void ThrowBomb(Vector2 direction)
+    public void ThrowBomb(Vector2 direction)
     {
         // 防止重复投掷
         if (hasBeenThrown)
         {
             return;
+        }
+
+        if (bombRigidbody != null)
+        {
+            bombRigidbody.simulated = true;
+        }
+
+        if (bombCollider != null)
+        {
+            bombCollider.enabled = true;
         }
         
         hasBeenThrown = true;
@@ -171,6 +188,55 @@ public class Bomb : ExplosionWeapon
     }
 
     /// <summary>
+    /// 切换炸弹是否处于手持状态。
+    /// 手持状态下禁用物理与碰撞，让炸弹稳定跟随挂点。
+    /// </summary>
+    public void SetHeldState(bool isHeld, Transform holder)
+    {
+        if (isHeld)
+        {
+            if (holder != null)
+            {
+                transform.SetParent(holder);
+                transform.localPosition = Vector3.zero;
+                transform.localRotation = Quaternion.identity;
+            }
+
+            if (bombRigidbody != null)
+            {
+                bombRigidbody.velocity = Vector2.zero;
+                bombRigidbody.angularVelocity = 0f;
+                bombRigidbody.simulated = false;
+            }
+
+            if (bombCollider != null)
+            {
+                bombCollider.enabled = false;
+            }
+
+            if (animator != null)
+            {
+                animator.SetBool(isFlyingParam, false);
+                animator.ResetTrigger(explodeTriggerParam);
+            }
+
+            return;
+        }
+
+        transform.SetParent(null);
+
+        if (bombRigidbody != null)
+        {
+            bombRigidbody.simulated = true;
+        }
+
+        if (bombCollider != null)
+        {
+            bombCollider.enabled = true;
+        }
+    }
+
+    /// <summary>
     /// 爆炸逻辑
     /// 
     /// 这个函数不应该由外部随便乱调，
@@ -185,7 +251,7 @@ public class Bomb : ExplosionWeapon
     /// 6. 通知 Animator 播放 Explosion 动画
     /// </summary>
     /// <param name="explosionPosition">爆炸发生的位置</param>
-    public override void Explode(Vector3 explosionPosition)
+    public void Explode(Vector3 explosionPosition)
     {
         // 防止同一颗炸弹重复爆炸
         if (hasExploded)
@@ -253,12 +319,7 @@ public class Bomb : ExplosionWeapon
                 continue;
             }
 
-            // 查找目标身上是否有可受伤接口
-            IDamageable damageable = hit.GetComponent<IDamageable>();
-            if (damageable != null)
-            {
-                damageable.TakeDamage(ExplosionDamage);
-            }
+            DamageTarget(hit.gameObject, ExplosionDamage);
         }
     }
 
@@ -296,6 +357,17 @@ public class Bomb : ExplosionWeapon
     public void OnExplosionAnimationFinished()
     {
         Destroy(gameObject);
+    }
+
+    /// <summary>
+    /// 执行攻击：根据玩家面向执行一次投掷
+    /// </summary>
+    public override bool Attack(GameObject attacker)
+    {
+        float facing = attacker.transform.localScale.x >= 0f ? 1f : -1f;
+        Vector2 direction = new Vector2(facing, 0.5f).normalized;
+        ThrowBomb(direction);
+        return true;
     }
 
     /// <summary>

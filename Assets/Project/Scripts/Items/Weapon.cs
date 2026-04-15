@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 /// <summary>
 /// 武器基类 - 所有武器的父类，提供攻击相关的基础属性和行为
@@ -30,11 +29,7 @@ public abstract class Weapon : Item
     /// <param name="player">使用武器的玩家对象</param>
     public override void OnUse(GameObject player)
     {
-
-
         base.OnUse(player);
-
-
     }
 
     /// <summary>
@@ -42,28 +37,22 @@ public abstract class Weapon : Item
     /// </summary>
     /// <param name="attacker">发起攻击的玩家对象</param>
     /// <returns>攻击是否成功</returns>
-    protected abstract bool Attack(GameObject attacker);
+    public abstract bool Attack(GameObject attacker);
 
 
 
-    /// <summary>
-    /// 当武器耐久度耗尽时调用的虚方法
-    /// </summary>
-    protected virtual void OnBroken()
-    {
-        // 子类可以重写此方法以实现破损效果
-    }
 
     /// <summary>
-    /// 对目标造成伤害
+    /// 对目标造成指定伤害
     /// </summary>
     /// <param name="target">目标对象</param>
-    protected void DamageTarget(GameObject target)
+    /// <param name="damageAmount">伤害值</param>
+    protected void DamageTarget(GameObject target, int damageAmount)
     {
         IDamageable damageable = target.GetComponent<IDamageable>();
         if (damageable != null)
         {
-            damageable.TakeDamage(damage);
+            damageable.TakeDamage(damageAmount);
         }
 
     }

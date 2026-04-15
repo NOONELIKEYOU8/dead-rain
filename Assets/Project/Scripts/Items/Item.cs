@@ -24,31 +24,11 @@ public abstract class Item : MonoBehaviour
     [TextArea(1, 4)]
     protected string description;
     
-    // /// <summary>
-    // /// 道具的图标，用于背包和UI显示
-    // /// </summary>
-    // [SerializeField]
-    // protected Sprite icon;
-    
-    // /// <summary>
-    // /// 道具的最大堆叠数量，1表示不可堆叠
-    // /// </summary>
-    // [SerializeField]
-    // protected int maxStack = 999;
-    
-    // /// <summary>
-    // /// 道具的稀有度等级，0-1的浮点数，用于品质分类
-    // /// </summary>
-    // [SerializeField]
-    // protected float rarity = 0.1f;
 
     // 公共访问属性 - 只读属性，防止外部直接修改
     public string ItemId => itemId;
     public string DisplayName => displayName;
     public string Description => description;
-    // public Sprite Icon => icon;
-    // public int MaxStack => maxStack;
-    // public float Rarity => rarity;
 
 
 
@@ -61,14 +41,4 @@ public abstract class Item : MonoBehaviour
     {
         Debug.Log($"使用道具: {displayName}");
     }
-
-    // // / <summary>
-    // // / 当玩家丢弃道具时调用的虚方法
-    // // / 子类可以重写此方法以实现特定的丢弃逻辑
-    // // / </summary>
-    // public virtual void OnDrop()
-    // {
-    //     Debug.Log($"丢弃道具: {displayName}");
-    // }
-
 }
