@@ -47,6 +47,9 @@ public class PlayerController : Damageable
     public float groundCheckRadius = 0.1f;
     public LayerMask groundLayer;
 
+    [Header("Animation")]
+    public Animator anim;
+
     // --- Inputs ---
     private InputAction moveAction;
     private InputAction jumpAction;
@@ -75,6 +78,7 @@ public class PlayerController : Damageable
     {
         base.Awake();
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
         defaultGravityScale = rb.gravityScale;
 
         SetupInputs();
@@ -257,9 +261,15 @@ public class PlayerController : Damageable
         if (isGrounded)
         {
             if (Mathf.Abs(moveInput) > 0.01f)
+            {
                 currentState = State.Run;
+                if (anim != null) anim.Play("Run");
+            }
             else
+            {
                 currentState = State.Idle;
+                if (anim != null) anim.Play("Idle");
+            }
         }
         else
         {
