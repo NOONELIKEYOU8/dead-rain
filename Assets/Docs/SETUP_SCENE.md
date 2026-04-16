@@ -65,8 +65,53 @@
 - 若希望手柄支持或更复杂输入，可考虑切换到新 Input System（需在 `Packages/manifest.json` 添加 `com.unity.inputsystem`）。
 
 已添加的脚本文件
-- [Assets/Scripts/PlayerController.cs](Assets/Scripts/PlayerController.cs#L1)
-- [Assets/Scripts/Damageable.cs](Assets/Scripts/Damageable.cs#L1)
-- [Assets/Scripts/SimpleEnemy.cs](Assets/Scripts/SimpleEnemy.cs#L1)
-- [Assets/Scripts/CameraFollow.cs](Assets/Scripts/CameraFollow.cs#L1)
-- [Assets/Scripts/GameManager.cs](Assets/Scripts/GameManager.cs#L1)
+- [Assets/Scripts/Player/PlayerController.cs](Assets/Scripts/Player/PlayerController.cs#L1)
+- [Assets/Scripts/Core/Damageable.cs](Assets/Scripts/Core/Damageable.cs#L1)
+- [Assets/Scripts/Enemies/SimpleEnemy.cs](Assets/Scripts/Enemies/SimpleEnemy.cs#L1) ← 保留原版，不受影响
+- [Assets/Scripts/Systems/CameraFollow.cs](Assets/Scripts/Systems/CameraFollow.cs#L1)
+- [Assets/Scripts/Core/GameManager.cs](Assets/Scripts/Core/GameManager.cs#L1)
+
+新 Enemy 系统（小怪 + Boss）
+---
+以下文件已加入仓库：
+
+| 脚本 | 说明 |
+|------|------|
+| `Assets/Scripts/Enemies/EnemyBase.cs` | 抽象基类：通用 AI（巡逻/追踪/接触伤害）、血条、动画触发 |
+| `Assets/Scripts/Enemies/MinionEnemy.cs` | 小怪：继承 EnemyBase，体型 1×1，血量 3，伤害 1 |
+| `Assets/Scripts/Enemies/BossEnemy.cs`  | Boss：继承 EnemyBase，体型 1.8×1.8，血量 20，伤害 3，额外冲刺攻击 |
+| `Assets/Scripts/UI/HealthBarCanvas.cs` | World-Space Canvas 血条，自动颜色渐变（绿→黄→红） |
+| `Assets/Editor/GenerateEnemyAssets.cs` | 编辑器工具：一键生成占位 Sprite / AnimatorController / Prefab |
+
+### 快速上手
+
+1. **生成占位资源**：Unity 菜单栏 → `工具 → 生成 Enemy 资源 (Generate Enemy Assets)`
+   - 自动生成 `Assets/Art/Sprites/placeholder_minion_32.png`（青色）和 `placeholder_boss_48.png`（紫色）
+   - 自动生成 `Assets/Art/Animations/MinionAnimator.controller` 和 `BossAnimator.controller`（含占位 Idle/Walk/Attack/Hit/Charge 状态）
+   - 自动生成 `Assets/Prefabs/MinionEnemy.prefab` 和 `BossEnemy.prefab`
+
+2. **在场景中使用**：
+   - 将 `EnemySpawner` 组件添加到生成点空对象
+   - 在 `enemyPrefab` 字段分别指定 `MinionEnemy.prefab` 或 `BossEnemy.prefab`
+   - 设置 `leftLimit`/`rightLimit` 巡逻边界（与之前相同）
+
+3. **血条**：
+   - 血条在运行时自动创建（World Space Canvas），无需额外配置
+   - 血量满时绿色 → 50% 以下黄色 → 25% 以下红色
+   - 如需自定义外观，可创建带 `HealthBarCanvas` 脚本的 Prefab，拖入敌人的 `healthBarPrefab` 字段
+
+4. **动画扩展**：
+   - 后续替换真实素材时，只需在对应 AnimatorController 的 Idle/Walk/Attack/Hit 等状态中替换 Motion（AnimationClip）即可
+   - Boss 额外有 `Charge`（冲刺）触发器
+
+### 数值对比
+
+| 属性 | 小怪 (MinionEnemy) | Boss (BossEnemy) |
+|------|--------------------|------------------|
+| 体型（Scale） | 1 × 1 | 1.8 × 1.8 |
+| 最大血量 | 3 | 20 |
+| 接触伤害 | 1 | 3 |
+| 移动速度 | 2.0 | 1.2（追击时同） |
+| 追踪范围 | 4 | 5 |
+| 攻击间隔 | 1 秒 | 1.5 秒 |
+| 冲刺攻击 | ✗ | ✓（进入 1.5 单位内触发） |
