@@ -28,12 +28,14 @@ public class PlayerController : Damageable
     private float jumpBufferCounter;
 
     [Header("Roll / Dodge")]
+    [Tooltip("翻滚躲避")]
     public float rollSpeed = 10f;
     public float rollDuration = 0.3f;
     public float rollCooldown = 0.5f;
     private float rollCooldownTimer;
 
     [Header("Parry")]
+    [Tooltip("格挡")]
     public float parryDuration = 0.2f;
     public float parryCooldown = 0.5f;
     private float parryCooldownTimer;
@@ -49,12 +51,14 @@ public class PlayerController : Damageable
     public KeyCode skill1Key = KeyCode.L;
     public KeyCode skill2Key = KeyCode.I; // 示意的按键
     public KeyCode rollKey = KeyCode.LeftShift;
+    public KeyCode executeKey = KeyCode.E;
 
     // --- 给模块 C 开放的委托/事件 ---
     public event System.Action OnPrimaryAttackInput;
     public event System.Action OnSecondaryAttackInput;
     public event System.Action OnSkill1Input;
     public event System.Action OnSkill2Input;
+    public event System.Action OnExecuteInput;
 
     Rigidbody2D rb;
     private float hInput;
@@ -169,6 +173,7 @@ public class PlayerController : Damageable
         }
         if (Input.GetKeyDown(skill1Key)) OnSkill1Input?.Invoke();
         if (Input.GetKeyDown(skill2Key)) OnSkill2Input?.Invoke();
+        if (Input.GetKeyDown(executeKey)) OnExecuteInput?.Invoke();
     }
 
     void ApplyMovement()
@@ -220,6 +225,7 @@ public class PlayerController : Damageable
         
         rb.velocity = Vector2.zero; // 原地防反不动
 
+        Debug.Log($"[LOG] [Player] 格挡开始！判定窗口: {parryDuration}秒");
         // 举盾过程/防反判定窗口
         yield return new WaitForSeconds(parryDuration);
 
@@ -227,6 +233,7 @@ public class PlayerController : Damageable
         isParrying = false;
         currentState = PlayerState.Idle;
         parryCooldownTimer = parryCooldown;
+        Debug.Log("[LOG] [Player] 格挡结束。");
     }
 
     // --- 当判定组件传来成功招架时的反馈 ---

@@ -284,7 +284,7 @@ public static class BuildScriptValidationScene
 
     private static GameObject GetOrCreateMinionPrefab()
     {
-        const string prefabPath = "Assets/Prefabs/MinionEnemy.prefab";
+        const string prefabPath = "Assets/Prefabs/NormalEnemy.prefab";
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
         if (prefab != null)
         {
@@ -294,7 +294,7 @@ public static class BuildScriptValidationScene
         EnsureFolder("Assets/Prefabs");
         EnsureFolder("Assets/Prefabs/Generated");
 
-        var temp = new GameObject("MinionEnemy_Temp");
+        var temp = new GameObject("NormalEnemy_Temp");
         temp.AddComponent<SpriteRenderer>().color = new Color(0.2f, 0.95f, 0.8f, 1f);
 
         var rb = temp.AddComponent<Rigidbody2D>();
@@ -304,13 +304,11 @@ public static class BuildScriptValidationScene
         var col = temp.AddComponent<BoxCollider2D>();
         col.size = new Vector2(0.8f, 1.2f);
 
-        var minion = temp.AddComponent<MinionEnemy>();
-        minion.enemyTypeId = "Enemy";
-        minion.useActiveStrike = true;
-        minion.strikeRange = 1.1f;
-        minion.strikeDamage = 1;
+        // 新版系统：NormalEnemy 组件会自动挂载依赖组件
+        var minion = temp.AddComponent<NormalEnemy>();
+        // 数值通过 ScriptableObject 配置，此处仅创建预制体框架
 
-        var saved = PrefabUtility.SaveAsPrefabAsset(temp, "Assets/Prefabs/Generated/MinionEnemy.prefab");
+        var saved = PrefabUtility.SaveAsPrefabAsset(temp, "Assets/Prefabs/Generated/NormalEnemy.prefab");
         Object.DestroyImmediate(temp);
         return saved;
     }

@@ -6,7 +6,7 @@ public class Damageable : MonoBehaviour
 {
     [Header("Health")]
     public int maxHealth = 5;
-    [HideInInspector]
+    // [HideInInspector]
     public int currentHealth;
     [HideInInspector]
     public bool invulnerable = false;
@@ -50,10 +50,12 @@ public class Damageable : MonoBehaviour
         BattleEvents.RaiseBeforeDamageApplied(ref ctx);
         int finalDamage = Mathf.Max(0, Mathf.RoundToInt(ctx.baseDamage));
 
+
         if (isParrying)
         {
             // 触发招架事件，不扣血，且进入短时间无敌以防连续帧受到多次判定
             OnParrySuccess?.Invoke(attacker, finalDamage);
+            //触发格挡成功事件
             BattleEvents.RaiseParrySuccess(gameObject, attacker, ctx);
             if (invulnCoroutine != null) StopCoroutine(invulnCoroutine);
             invulnCoroutine = StartCoroutine(FlashRoutine(0.2f)); // 短暂无敌
