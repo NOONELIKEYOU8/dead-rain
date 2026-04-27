@@ -75,6 +75,9 @@ mono_crash.*
 *.unitypackage.meta
 *.app
 
+# Lightmap Streaming Cache
+*.lscache
+
 # Crashlytics generated file
 crashlytics-build.properties
 
