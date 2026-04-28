@@ -36,11 +36,7 @@
       "url": "https://packages.unity.cn"
     },
     "com.unity.2d.common": {
-<<<<<<< HEAD
-      "version": "8.0.4",
-=======
       "version": "8.1.0",
->>>>>>> dead-rain/qgh
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -176,11 +172,7 @@
       "url": "https://packages.unity.cn"
     },
     "com.unity.inputsystem": {
-<<<<<<< HEAD
-      "version": "1.7.0",
-=======
       "version": "1.14.0",
->>>>>>> dead-rain/qgh
       "depth": 0,
       "source": "registry",
       "dependencies": {
