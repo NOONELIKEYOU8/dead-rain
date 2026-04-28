@@ -3,18 +3,20 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Enemy
+  - ParticleContainer
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Enemy
+  - 
   - Water
   - UI
   - Ground
-  - 
-  - 
-  - 
+  - Damageable
+  - Player
+  - Weapon
   - 
   - 
   - 
@@ -40,4 +42,22 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 2170083913
+    locked: 0
+  - name: Decoration
+    uniqueID: 2662969893
+    locked: 0
+  - name: Platforms
+    uniqueID: 3289586151
+    locked: 0
+  - name: Enemy
+    uniqueID: 4194127999
+    locked: 0
+  - name: Player
+    uniqueID: 687696237
+    locked: 0
+  - name: Foreground Decoration
+    uniqueID: 2544964521
     locked: 0
