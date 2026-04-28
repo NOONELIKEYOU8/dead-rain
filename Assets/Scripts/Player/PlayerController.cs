@@ -59,18 +59,34 @@ public class PlayerController : Damageable
     Rigidbody2D rb;
     private float hInput;
     private float facingDirection = 1f;
+    private Animator anim; // 动画控制器引用
+
+    [Header("角色缩放")]
+    public float baseScale = 0.35f; // 控制人物整体大小，数值越小越矮小
+
+    private CapsuleCollider2D capsuleCol; // 碰撞体引用（用于底部对齐）
 
     protected override void Awake()
     {
         base.Awake();
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>(); // 获取动画控制器
+        capsuleCol = GetComponent<CapsuleCollider2D>();
+
+        // 精灵 Pivot 在底部中心，需要把碰撞体向上偏移，使碰撞体底部对齐脚底
+        if (capsuleCol != null)
+        {
+            // 偏移量 = 碰撞体高度的一半，让碰撞体底部刚好在 transform.position（脚底）
+            capsuleCol.offset = new Vector2(capsuleCol.offset.x, capsuleCol.size.y / 2f);
+        }
 
         if (groundCheck == null)
         {
             var go = new GameObject("GroundCheck");
             go.transform.SetParent(transform);
-            go.transform.localPosition = new Vector3(0, -0.5f, 0);
+            // Pivot 在脚底了，groundCheck 放在脚底稍下方一点即可
+            go.transform.localPosition = new Vector3(0, -0.05f, 0);
             groundCheck = go.transform;
         }
         
@@ -130,9 +146,9 @@ public class PlayerController : Damageable
         if (hInput > 0.1f) facingDirection = 1f;
         else if (hInput < -0.1f) facingDirection = -1f;
 
-        // 面向翻转
-        if (facingDirection > 0) transform.localScale = new Vector3(1, 1, 1);
-        else transform.localScale = new Vector3(-1, 1, 1);
+        // 面向翻转（保留 baseScale 缩放）
+        if (facingDirection > 0) transform.localScale = new Vector3(baseScale, baseScale, 1);
+        else transform.localScale = new Vector3(-baseScale, baseScale, 1);
 
         // 处理跳跃
         if (jumpBufferCounter > 0f && coyoteTimeCounter > 0f)
@@ -191,6 +207,13 @@ public class PlayerController : Damageable
         {
             if (Mathf.Abs(rb.velocity.x) > 0.1f) currentState = PlayerState.Run;
             else currentState = PlayerState.Idle;
+        }
+
+        // 同步动画：Speed > 0.1 时切换到 Run，否则 Stand
+        if (anim != null)
+        {
+            float speed = Mathf.Abs(rb.velocity.x);
+            anim.SetFloat("Speed", speed);
         }
     }
 
