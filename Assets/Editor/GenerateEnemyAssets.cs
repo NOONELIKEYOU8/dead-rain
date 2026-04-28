@@ -61,7 +61,7 @@ public static class GenerateEnemyAssets
             "• Assets/Art/Sprites/placeholder_boss_48.png\n" +
             "• Assets/Art/Animations/MinionAnimator.controller\n" +
             "• Assets/Art/Animations/BossAnimator.controller\n" +
-            "• Assets/Prefabs/MinionEnemy.prefab\n" +
+            "• Assets/Prefabs/NormalEnemy.prefab\n" +
             "• Assets/Prefabs/BossEnemy.prefab\n\n" +
             "请在 EnemySpawner 的 enemyPrefab 字段分别指定对应 Prefab。",
             "确定");
@@ -266,18 +266,18 @@ public static class GenerateEnemyAssets
     }
 
     // ════════════════════════════════════════════════════════════════════════
-    //  辅助：创建 MinionEnemy Prefab
+    //  辅助：创建 NormalEnemy Prefab
     // ════════════════════════════════════════════════════════════════════════
     static void CreateMinionPrefab(Sprite sprite, AnimatorController ctrl)
     {
-        string prefabPath = $"{PrefabsDir}/MinionEnemy.prefab";
+        string prefabPath = $"{PrefabsDir}/NormalEnemy.prefab";
         if (File.Exists(prefabPath))
         {
             Debug.Log($"[GenerateEnemyAssets] Prefab already exists: {prefabPath}");
             return;
         }
 
-        var go = new GameObject("MinionEnemy");
+        var go = new GameObject("NormalEnemy");
 
         // ── 组件 ──
         var sr = go.AddComponent<SpriteRenderer>();
@@ -295,12 +295,11 @@ public static class GenerateEnemyAssets
             an.runtimeAnimatorController = ctrl;
         }
 
-        var enemy = go.AddComponent<MinionEnemy>();
-        enemy.maxHealth     = 3;
-        enemy.contactDamage = 1;
-        enemy.patrolSpeed   = 2.0f;
-        enemy.chaseRange    = 4f;
-        enemy.attackInterval = 1f;
+        // 新版系统：NormalEnemy 组件会自动挂载 EnemyStateMachine、
+        // EnemyAIController、StanceBar 等（通过 RequireComponent）
+        var enemy = go.AddComponent<NormalEnemy>();
+        // 注意：数值配置通过 ScriptableObject（EnemyDataSO）设置，
+        // 此处仅创建预制体框架，具体数值请在 Inspector 中配置 SO 实例。
 
         go.layer = LayerMask.NameToLayer("Enemy") >= 0 ? LayerMask.NameToLayer("Enemy") : 0;
 
@@ -340,14 +339,10 @@ public static class GenerateEnemyAssets
             an.runtimeAnimatorController = ctrl;
         }
 
+        // 新版系统：BossEnemy 组件会自动挂载依赖组件
         var boss = go.AddComponent<BossEnemy>();
-        boss.maxHealth        = 20;
-        boss.contactDamage    = 3;
-        boss.patrolSpeed      = 1.2f;
-        boss.chaseRange       = 5f;
-        boss.attackInterval   = 1.5f;
-        boss.sizeMultiplier   = 1.8f;
-        boss.chargeRange      = 1.5f;
+        // 注意：数值配置通过 ScriptableObject（EnemyDataSO）设置，
+        // 此处仅创建预制体框架，具体数值请在 Inspector 中配置 SO 实例。
 
         go.layer = LayerMask.NameToLayer("Enemy") >= 0 ? LayerMask.NameToLayer("Enemy") : 0;
 

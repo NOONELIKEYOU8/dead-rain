@@ -42,13 +42,17 @@ public class GunWeapon : Weapon
                 Instantiate(hitEffectPrefab, hit.point, Quaternion.identity);
             }
 
-            IDamageable idmg = hit.collider.GetComponentInParent<IDamageable>();
-            if (idmg != null)
+            // 优先检测 Hurtbox（新敌人系统）
+            var hurtbox = hit.collider.GetComponent<Hurtbox>();
+            if (hurtbox != null && hurtbox.owner != null && hurtbox.owner != attacker)
             {
-                idmg.TakeDamage(damage);
+                Vector2 knockbackDir = (hit.point - (Vector2)attacker.transform.position).normalized;
+                DamageInfo dmgInfo = new DamageInfo(damage, knockbackDir, 5f, attacker, true);
+                hurtbox.OnHit(dmgInfo);
             }
             else
             {
+                // 兼容旧系统：检测 Damageable 组件
                 Damageable legacyDamageable = hit.collider.GetComponentInParent<Damageable>();
                 if (legacyDamageable != null)
                 {

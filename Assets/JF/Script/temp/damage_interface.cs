@@ -1,31 +1,19 @@
 using UnityEngine;
 
-public class DamageInterfaceExample : MonoBehaviour, IDamageable
+/// <summary>
+/// 伤害接口示例（已迁移为继承 Damageable 基类）
+/// 演示如何通过 Damageable 统一伤害系统接收伤害
+/// </summary>
+public class DamageInterfaceExample : Damageable
 {
-    [SerializeField] private int maxHealth = 10;
-
-    private int currentHealth;
-
-    private void Awake()
+    protected override void Awake()
     {
-        currentHealth = maxHealth;
+        base.Awake();
     }
 
-    public void TakeDamage(int damage)
-    {
-        currentHealth -= damage;
-
-        Debug.Log($"{name} 受到 {damage} 点伤害，剩余血量: {currentHealth}");
-
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
-    }
-
-    private void Die()
+    protected override void Die()
     {
         Debug.Log($"{name} 死亡");
-        Destroy(gameObject);
+        base.Die();
     }
 }

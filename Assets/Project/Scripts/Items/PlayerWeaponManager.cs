@@ -30,12 +30,12 @@ public class PlayerWeaponManager : MonoBehaviour
 
     [Header("Input")] // 在面板显示标题：Input
     [SerializeField] private KeyCode switchKey = KeyCode.P;
-    [SerializeField] private KeyCode attackKey = KeyCode.J;
 
     private int currentWeaponIndex = -1;
     private Weapon currentWeaponInstance;
     private Collider2D[] playerColliders;
     private Transform ownerTransform;
+    private PlayerController _playerController;
 
     private void Awake()
     {
@@ -51,6 +51,12 @@ public class PlayerWeaponManager : MonoBehaviour
     private void OnDisable()
     {
         ClearCurrentWeapon();
+        UnsubscribeEvents();
+    }
+
+    private void Start()
+    {
+        SubscribeEvents();
     }
 
     private void Update()
@@ -59,13 +65,25 @@ public class PlayerWeaponManager : MonoBehaviour
         {
             EquipNext();
         }
+<<<<<<< HEAD
 
         if (Input.GetKeyDown(attackKey))
+    {
+        _playerController = GetComponentInParent<PlayerController>();
+        if (_playerController != null)
         {
-            AttackCurrentWeapon();
+            _playerController.OnPrimaryAttackInput += AttackCurrentWeapon;
         }
     }
 
+    private void UnsubscribeEvents()
+    {
+        if (_playerController != null)
+        {
+            _playerController.OnPrimaryAttackInput -= AttackCurrentWeapon;
+>>>>>>> dead-rain/qgh
+        }
+    }
     public void EquipWeapon(int index)
     {
         if (!IsValidIndex(index))

@@ -43,23 +43,6 @@ public abstract class Weapon : Item
 
 
     /// <summary>
-    /// 对目标造成指定伤害
-    /// </summary>
-    /// <param name="target">目标对象</param>
-    /// <param name="damageAmount">伤害值</param>
-    protected void DamageTarget(GameObject target, int damageAmount)
-    {
-        IDamageable damageable = target.GetComponent<IDamageable>();
-        if (damageable != null)
-        {
-            damageable.TakeDamage(damageAmount);
-        }
-
-    }
-
-
-
-    /// <summary>
     /// 在编辑器中可视化武器的攻击范围
     /// </summary>
     protected virtual void OnDrawGizmosSelected()
@@ -68,6 +51,7 @@ public abstract class Weapon : Item
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }
+<<<<<<< HEAD
 
 /// <summary>
 /// 可伤害接口 - 实现此接口的对象可以受到伤害
@@ -76,3 +60,5 @@ public interface IDamageable
 {
     void TakeDamage(int damage);
 }
+=======
+>>>>>>> dead-rain/qgh

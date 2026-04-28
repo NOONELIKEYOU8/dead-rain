@@ -63,16 +63,13 @@ public class SimpleProjectile : MonoBehaviour
 
         if ((targetLayers.value & (1 << other.gameObject.layer)) == 0) return;
 
-        var d = other.GetComponentInParent<Damageable>();
-        if (d == null) return;
+        // 使用统一伤害解析器处理 Hurtbox / Damageable 双系统
+        Vector2 knockbackDir = (other.transform.position - transform.position).normalized;
+        DamageInfo dmgInfo = new DamageInfo(baseDamage, knockbackDir, 3f, owner, true);
 
-        var ctx = CombatContext.Create(owner, d.gameObject, baseDamage, damageType, sourceTag);
-        ctx.hitPoint = other.ClosestPoint(transform.position);
-
-        BattleEvents.RaiseAttackStarted(ctx);
-        d.TakeDamage(ctx, owner);
-        BattleEvents.RaiseAttackResolved(ctx);
-
-        Destroy(gameObject);
+        if (HitResolver.TryDealDamage(other, dmgInfo, owner))
+        {
+            Destroy(gameObject);
+        }
     }
 }
