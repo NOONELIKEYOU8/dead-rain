@@ -11,6 +11,13 @@ public class SO_AggressiveWeaponData : SO_WeaponData
 
     private void OnEnable()
     {
+        if (attackDetails == null)
+        {
+            amountOfAttacks = 0;
+            movementSpeed = System.Array.Empty<float>();
+            return;
+        }
+
         amountOfAttacks = attackDetails.Length;
 
         movementSpeed = new float[amountOfAttacks];

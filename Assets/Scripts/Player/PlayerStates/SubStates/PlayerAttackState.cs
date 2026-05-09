@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerAttackState : PlayerAbilityState
 {
     private Weapon weapon;
+    public bool HasWeapon => weapon != null;
 
     private int xInput;
 
@@ -23,6 +24,12 @@ public class PlayerAttackState : PlayerAbilityState
 
         setVelocity = false;
 
+        if (weapon == null)
+        {
+            isAbilityDone = true;
+            return;
+        }
+
         weapon.EnterWeapon();
     }
 
@@ -30,7 +37,10 @@ public class PlayerAttackState : PlayerAbilityState
     {
         base.Exit();
 
-        weapon.ExitWeapon();
+        if (weapon != null)
+        {
+            weapon.ExitWeapon();
+        }
     }
 
     public override void LogicUpdate()
@@ -54,7 +64,10 @@ public class PlayerAttackState : PlayerAbilityState
     public void SetWeapon(Weapon weapon)
     {
         this.weapon = weapon;
-        weapon.InitializeWeapon(this, core);
+        if (weapon != null)
+        {
+            weapon.InitializeWeapon(this, core);
+        }
     }
 
     public void SetPlayerVelocity(float velocity)

@@ -6,7 +6,7 @@ public class WeaponAnimationToWeapon : MonoBehaviour
 {
     private Weapon weapon;
 
-    private void Start()
+    private void Awake()
     {
         weapon = GetComponentInParent<Weapon>();
     }

@@ -40,6 +40,8 @@ public class Player : MonoBehaviour
     #region Other Variables
 
     private Vector2 workspace;
+    private int inventoryVersion = -1;
+    private bool wasShieldHeld;
     #endregion
 
     #region Unity Callback Functions
@@ -75,9 +77,7 @@ public class Player : MonoBehaviour
         MovementCollider = GetComponent<BoxCollider2D>();
         Inventory = GetComponent<PlayerInventory>();
 
-
-        PrimaryAttackState.SetWeapon(Inventory.weapons[(int)CombatInputs.primary]);
-        //SecondaryAttackState.SetWeapon(Inventory.weapons[(int)CombatInputs.primary]);
+        RefreshEquippedWeapons();
 
         StateMachine.Initialize(IdleState);
 
@@ -85,6 +85,8 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        RefreshEquippedWeapons();
+        UpdateShieldBlock();
         Core.LogicUpdate();
         StateMachine.CurrentState.LogicUpdate();
     }
@@ -114,6 +116,34 @@ public class Player : MonoBehaviour
 
     private void AnimationFinishTrigger() => StateMachine.CurrentState.AnimationFinishTrigger();
 
+    private void RefreshEquippedWeapons()
+    {
+        if (Inventory == null || inventoryVersion == Inventory.Version)
+        {
+            return;
+        }
+
+        PrimaryAttackState.SetWeapon(Inventory.GetWeapon(CombatInputs.primary));
+        SecondaryAttackState.SetWeapon(Inventory.GetWeapon(CombatInputs.sencondary));
+        inventoryVersion = Inventory.Version;
+    }
+
+    private void UpdateShieldBlock()
+    {
+        if (Inventory == null || Inventory.GetShield() == null)
+        {
+            return;
+        }
+
+        bool isShieldHeld = InputHandler != null && InputHandler.SecondaryAttackHeld;
+        if (isShieldHeld == wasShieldHeld)
+        {
+            return;
+        }
+
+        Inventory.GetShield().SetBlocking(isShieldHeld);
+        wasShieldHeld = isShieldHeld;
+    }
 
     #endregion
 

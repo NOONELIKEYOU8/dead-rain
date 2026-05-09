@@ -23,6 +23,8 @@ public class PlayerInputHandler : MonoBehaviour
     public bool DashInputStop { get; private set; }
 
     public bool[] AttackInputs { get; private set; }
+    public bool PrimaryAttackHeld => IsAttackHeld(CombatInputs.primary) || (Mouse.current != null && Mouse.current.leftButton.isPressed);
+    public bool SecondaryAttackHeld => IsAttackHeld(CombatInputs.sencondary) || (Mouse.current != null && Mouse.current.rightButton.isPressed);
 
     [SerializeField]
     private float inputHoldTime = 0.2f;
@@ -30,12 +32,15 @@ public class PlayerInputHandler : MonoBehaviour
     private float jumpInputStartTime;
     private float dashInputStartTime;
 
+    private void Awake()
+    {
+        int count = Enum.GetValues(typeof(CombatInputs)).Length;
+        AttackInputs = new bool[count];
+    }
+
     private void Start()
     {
         playerInput = GetComponent<PlayerInput>();
-
-        int count = Enum.GetValues(typeof(CombatInputs)).Length;
-        AttackInputs = new bool[count];
 
         cam = Camera.main;
     }
@@ -48,7 +53,7 @@ public class PlayerInputHandler : MonoBehaviour
 
     public void OnPrimaryAttackInput(InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started || context.performed)
         {
             AttackInputs[(int)CombatInputs.primary] = true;
         }
@@ -61,15 +66,15 @@ public class PlayerInputHandler : MonoBehaviour
 
     public void OnSecondaryAttackInput(InputAction.CallbackContext context)
     {
-        //if (context.started)
-        //{
-        //    AttackInputs[(int)CombatInputs.sencondary] = true;
-        //}
+        if (context.started || context.performed)
+        {
+            AttackInputs[(int)CombatInputs.sencondary] = true;
+        }
 
-        //if (context.canceled)
-        //{
-        //    AttackInputs[(int)CombatInputs.sencondary] = false;
-        //}
+        if (context.canceled)
+        {
+            AttackInputs[(int)CombatInputs.sencondary] = false;
+        }
     }
 
     public void OnMoveInput(InputAction.CallbackContext context)
@@ -146,6 +151,11 @@ public class PlayerInputHandler : MonoBehaviour
     public void UseJumpInput() => JumpInput = false;
 
     public void UseDashInput() => DashInput = false;
+
+    public bool IsAttackHeld(CombatInputs input)
+    {
+        return AttackInputs != null && AttackInputs[(int)input];
+    }
 
     private void CheckJumpInputHoldTime()
     {

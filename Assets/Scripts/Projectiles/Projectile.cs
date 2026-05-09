@@ -8,6 +8,7 @@ public class Projectile : MonoBehaviour
 
     private float speed;
     private float travelDistance;
+    private float damage;
     private float xStartPos;
 
     [SerializeField]
@@ -26,6 +27,8 @@ public class Projectile : MonoBehaviour
     private LayerMask whatIsPlayer;
     [SerializeField]
     private Transform damagePos;
+
+    private Transform ownerRoot;
 
     private void Start()
     {
@@ -62,7 +65,16 @@ public class Projectile : MonoBehaviour
 
             if (damageHit)
             {
-                //damageHit.transform.SendMessage("Damage", attackDetails);
+                if (ownerRoot != null && damageHit.transform.root == ownerRoot)
+                {
+                    return;
+                }
+
+                if (damageHit.TryGetComponent(out IDamageable damageable))
+                {
+                    damageable.Damage(damage);
+                }
+
                 Destroy(gameObject);
             }
 
@@ -85,7 +97,14 @@ public class Projectile : MonoBehaviour
     {
         this.speed = speed;
         this.travelDistance = travelDistance;
-        //attackDetails.damageAmount = damage;
+        this.damage = damage;
+    }
+
+    public void FireProjectile(float speed, float travelDistance, float damage, LayerMask targetMask, Transform ownerRoot)
+    {
+        FireProjectile(speed, travelDistance, damage);
+        whatIsPlayer = targetMask;
+        this.ownerRoot = ownerRoot;
     }
 
     private void OnDrawGizmos()

@@ -90,13 +90,13 @@ public class PlayerInAirState : PlayerState
 
         CheckJumpMultiplier();
 
-        if (player.InputHandler.AttackInputs[(int)CombatInputs.primary])
-        {
-            stateMachine.ChangeState(player.PrimaryAttackState);
-        }
-        else if (player.InputHandler.AttackInputs[(int)CombatInputs.sencondary])
+        if (player.InputHandler.PrimaryAttackHeld && player.InputHandler.SecondaryAttackHeld && player.SecondaryAttackState.HasWeapon)
         {
             stateMachine.ChangeState(player.SecondaryAttackState);
+        }
+        else if (player.InputHandler.PrimaryAttackHeld && player.PrimaryAttackState.HasWeapon)
+        {
+            stateMachine.ChangeState(player.PrimaryAttackState);
         }
         else if (isGrounded && Movement.CurrentVelocity.y < 0.01f)
         {
