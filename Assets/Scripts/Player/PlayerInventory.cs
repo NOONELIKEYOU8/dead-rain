@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
@@ -11,6 +12,10 @@ public class PlayerInventory : MonoBehaviour
     [SerializeField] private int secondaryWeaponIndex = 1;
 
     public int Version { get; private set; }
+    public int PrimaryWeaponIndex => primaryWeaponIndex;
+    public IReadOnlyList<Weapon> Weapons => weapons;
+
+    public event Action OnWeaponChanged;
 
     private void Update()
     {
@@ -45,6 +50,7 @@ public class PlayerInventory : MonoBehaviour
 
         primaryWeaponIndex = index;
         Version++;
+        OnWeaponChanged?.Invoke();
     }
 
     private Weapon GetWeaponAt(int index)
