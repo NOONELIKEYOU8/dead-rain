@@ -37,6 +37,8 @@ public class AggressiveWeapon : Weapon
     private void CheckMeleeAttack()
     {
         WeaponAttackDetails details = aggressiveWeaponData.AttackDetails[attackCounter];
+        PlayerRunStats runStats = core != null ? core.GetComponentInParent<PlayerRunStats>() : null;
+        float damageAmount = runStats != null ? runStats.ModifyMeleeDamage(details.damageAmount) : details.damageAmount;
 
         foreach (IDamageable item in detectedDamageables.ToList())
         {
@@ -46,7 +48,7 @@ public class AggressiveWeapon : Weapon
                 continue;
             }
 
-            item.Damage(details.damageAmount);
+            item.Damage(damageAmount);
         }
 
         foreach (IKnockbackable item in detectedKnockbackables.ToList())
@@ -59,6 +61,8 @@ public class AggressiveWeapon : Weapon
 
             item.Knockback(details.knockbackAngle, details.knockbackStrength, Movement.FacingDirection);
         }
+
+        runStats?.TryFireBonusProjectile(transform, Movement != null ? Movement.FacingDirection : 1);
     }
 
     public override void ExitWeapon()

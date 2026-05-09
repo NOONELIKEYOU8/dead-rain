@@ -27,5 +27,8 @@ public class RangedWeapon : Weapon
         Quaternion rotation = facingDirection >= 0 ? Quaternion.identity : Quaternion.Euler(0f, 180f, 0f);
         Projectile projectile = Instantiate(projectilePrefab, transform.position + offset, rotation);
         projectile.FireProjectile(projectileSpeed, projectileTravelDistance, projectileDamage, targetMask, transform.root);
+
+        PlayerRunStats runStats = core != null ? core.GetComponentInParent<PlayerRunStats>() : null;
+        runStats?.TryFireBonusProjectile(transform, facingDirection);
     }
 }

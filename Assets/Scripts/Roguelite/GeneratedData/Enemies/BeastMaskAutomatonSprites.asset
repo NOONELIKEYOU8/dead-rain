@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 435a61e42a90b0a4dad80b0cb49dc3a9, type: 3}
+  m_Name: BeastMaskAutomatonSprites
+  m_EditorClassIdentifier: 
+  id: beast_mask_automaton_sprites
+  idle: {fileID: 546708281564828199, guid: d244da22305368244b9bad02afa6531a, type: 3}
+  move: {fileID: -4153944365816541806, guid: d244da22305368244b9bad02afa6531a, type: 3}
+  attack: {fileID: 0}
+  cast: {fileID: 0}
+  charge: {fileID: -5477840223169564712, guid: d244da22305368244b9bad02afa6531a, type: 3}
+  hurt: {fileID: -7003558351608310997, guid: d244da22305368244b9bad02afa6531a, type: 3}

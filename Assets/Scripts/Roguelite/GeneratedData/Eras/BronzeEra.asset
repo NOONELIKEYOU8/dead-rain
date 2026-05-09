@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9146ed0af0fc52d4da4e33cdc03e333d, type: 3}
+  m_Name: BronzeEra
+  m_EditorClassIdentifier: 
+  id: era_bronze
+  displayName: "\u5546\u5468 / \u9752\u94DC\u5668\u65F6\u671F"
+  description: "\u9752\u94DC\u7EB9\u6837\u3001\u796D\u7940\u53F0\u3001\u7532\u9AA8\u6587\u548C\u5730\u4E0B\u9057\u8FF9\u6784\u6210\u7684\u7B2C\u4E00\u4E2A\u88C2\u9699\u526F\u672C\u3002"
+  era: 0
+  visualTheme: "\u9752\u94DC\u7EB9\u6837\u3001\u796D\u7940\u53F0\u3001\u7532\u9AA8\u6587\u3001\u53E4\u6218\u8F66\u3001\u706B\u5149\u3001\u5730\u4E0B\u9057\u8FF9"
+  enemyPool:
+  - {fileID: 11400000, guid: 69dee35fa43ec214bbe736e200be2d4e, type: 2}
+  - {fileID: 11400000, guid: c3dc56c9763074a4a8c1d7f3d30f0890, type: 2}
+  - {fileID: 11400000, guid: 54665b63687860543bb939182a62fcfc, type: 2}
+  miniBossPool: []
+  finalBoss: {fileID: 11400000, guid: 3fa731ed29a6bd14f9223357a9bcfcc3, type: 2}
+  itemDropPool:
+  - {fileID: 11400000, guid: d46714b33ea05694fb51b595b3bff6ac, type: 2}
+  - {fileID: 11400000, guid: 52a4321c1176f2845be7f7c4bfdc10d4, type: 2}
+  - {fileID: 11400000, guid: cc871953551bbd44a83ca8a71d7311e7, type: 2}
+  - {fileID: 11400000, guid: 0eb44c926b12ec9478e5956318878443, type: 2}
+  - {fileID: 11400000, guid: a5ef23ffbcd116f4a9124fc8d5f8801f, type: 2}
+  prefabPathPlaceholder: Assets/Scenes/Era_Bronze.unity
+  tilemapPrefabPathPlaceholder: 'TODO: Bronze tilemap prefab'
+  backgroundMusicPlaceholder: 'TODO: Bronze ritual drums loop'
+  iconPlaceholder: {fileID: 1691838132692297846, guid: f7d945379878f224eac14281cce8a7c6, type: 3}
+  unlockCondition: Run start
+  tier: 0
+  specialMechanics: "\u53EC\u5524\u9752\u94DC\u5668\u56FE\u817E\uFF0C\u5468\u671F\u6027\u91CA\u653E\u8303\u56F4\u653B\u51FB\u3002"

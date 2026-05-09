@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15bb3a05a41355846a8d46c29944d75f, type: 3}
+  m_Name: BronzeKingShadow
+  m_EditorClassIdentifier: 
+  id: bronze_king_shadow
+  displayName: "\u9752\u94DC\u738B\u5F71"
+  description: "\u65F6\u95F4\u88C2\u9699\u4E2D\u7684\u5546\u738B\u6B66\u4E01\u610F\u8C61\u5316\u9752\u94DC\u738B\u5F71\u3002"
+  era: 0
+  tier: 4
+  hp: 320
+  damage: 16
+  moveSpeed: 2.2
+  attackPattern: 5
+  phaseHealthPercentThresholds:
+  - 0.5
+  baseSkillCooldown: 2.4
+  phaseTwoCooldownMultiplier: 0.62
+  prefab: {fileID: 134310977267427287, guid: 3c11a46ec2cabe040acbcba15618e13a, type: 3}
+  prefabPathPlaceholder: Assets/Prefabs/Roguelite/Bosses/BronzeKingShadow.prefab
+  iconPlaceholder: {fileID: 1691838132692297846, guid: f7d945379878f224eac14281cce8a7c6, type: 3}
+  specialMechanics: "\u9752\u94DC\u6A2A\u626B\u3001\u517D\u9762\u51B2\u950B\u3001\u796D\u5668\u9707\u8361\u3001\u53EC\u5524\u9752\u94DC\u6208\u5175\uFF1B\u534A\u8840\u540E\u52A0\u901F\u3002"

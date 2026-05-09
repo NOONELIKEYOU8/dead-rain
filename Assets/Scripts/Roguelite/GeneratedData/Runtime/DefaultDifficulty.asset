@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5251027f917d7a44d9673fdfe2196270, type: 3}
+  m_Name: DefaultDifficulty
+  m_EditorClassIdentifier: 
+  id: default_risk_scaling
+  displayName: "\u65F6\u95F4\u88C2\u9699\u96BE\u5EA6"
+  description: "\u968F\u65F6\u95F4\u548C\u5DF2\u901A\u5173\u65F6\u4EE3\u63A8\u8FDB\u7684\u5C40\u5185\u96BE\u5EA6\u66F2\u7EBF\u3002"
+  era: 0
+  baseDifficulty: 1
+  timeScale: 0.018
+  eraScale: 0.65
+  multiplierPerDifficulty: 0.16
+  baseSpawnInterval: 4.5
+  minSpawnInterval: 1.5
+  spawnIntervalDifficultyFactor: 0.08
+  maxAliveEnemies: 8
+  baseEliteChance: 0.02
+  eliteChancePerMinute: 0.018
+  maxEliteChance: 0.35
+  baseDropChance: 0.12
+  dropChanceDifficultyBonus: 0.01
+  maxDropChance: 0.45
+  hp: 0
+  damage: 0
+  moveSpeed: 0
+  attackPattern: 0
+  prefabPathPlaceholder: 
+  iconPlaceholder: {fileID: 0}
+  tier: 0
+  specialMechanics: difficultyLevel = baseDifficulty + elapsedTime * timeScale +
+    clearedEraCount * eraScale

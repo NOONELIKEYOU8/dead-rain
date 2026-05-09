@@ -58,4 +58,12 @@ public class Stats : CoreComponent {
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
+
+    public void SetMaxHealth(float value, bool refill)
+    {
+        maxHealth = Mathf.Max(1f, value);
+        currentHealth = refill ? maxHealth : Mathf.Clamp(currentHealth, 0f, maxHealth);
+        isDead = currentHealth <= 0f;
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
 }

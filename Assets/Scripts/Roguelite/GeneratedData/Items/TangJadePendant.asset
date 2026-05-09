@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16db7461b34fbfd43b5479c8baefee29, type: 3}
+  m_Name: TangJadePendant
+  m_EditorClassIdentifier: 
+  id: tang_jade_pendant
+  displayName: "\u5510\u98CE\u7389\u4F69"
+  description: "\u51FB\u6740\u654C\u4EBA\u540E\u5C0F\u5E45\u56DE\u8840\uFF0C\u6709\u89E6\u53D1\u95F4\u9694\u3002"
+  era: 2
+  tier: 1
+  effectType: 2
+  baseValue: 3
+  stackValue: 1.5
+  maxValue: 0
+  triggerCooldown: 1.2
+  hp: 0
+  damage: 0
+  moveSpeed: 0
+  attackPattern: 0
+  prefabPathPlaceholder: 
+  iconPlaceholder: {fileID: 1691838132692297846, guid: f7d945379878f224eac14281cce8a7c6, type: 3}
+  stackable: 1
+  specialMechanics: "\u51FB\u6740\u654C\u4EBA\u540E\u5C0F\u5E45\u56DE\u8840\uFF0C\u6709\u89E6\u53D1\u95F4\u9694\u3002"

@@ -37,6 +37,15 @@ public class UIHealthBar : MonoBehaviour
         HandleHealthChanged(stats.CurrentHealth, stats.MaxHealth);
     }
 
+    public void SetPercent(float percent)
+    {
+        targetPercent = Mathf.Clamp01(percent);
+        if (fillImage != null && fillImage.fillAmount <= 0f)
+        {
+            fillImage.fillAmount = targetPercent;
+        }
+    }
+
     private void OnDestroy()
     {
         if (stats != null)
