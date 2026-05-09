@@ -48,7 +48,7 @@ public class Combat : CoreComponent, IDamageable,IKnockbackable
 
     public void Damage(float amount)
     {
-        if (Time.time < lastDamageTime + invulnerabilityTime)
+        if (!isActiveAndEnabled || !gameObject.activeInHierarchy || Stats == null || Stats.IsDead || Time.time < lastDamageTime + invulnerabilityTime)
         {
             return;
         }
@@ -61,6 +61,11 @@ public class Combat : CoreComponent, IDamageable,IKnockbackable
 
     public void Knockback(Vector2 angle, float strength, int direction)
     {
+        if (Stats != null && Stats.IsDead)
+        {
+            return;
+        }
+
         Movement?.SetVelocity(strength, angle, direction);
         Movement.CanSetVelocity = false;
         isKnockbackActive = true;
@@ -78,7 +83,7 @@ public class Combat : CoreComponent, IDamageable,IKnockbackable
 
     private void PlayHitFlash()
     {
-        if (spriteRenderers == null || spriteRenderers.Length == 0)
+        if (!isActiveAndEnabled || !gameObject.activeInHierarchy || spriteRenderers == null || spriteRenderers.Length == 0)
         {
             return;
         }

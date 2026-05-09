@@ -9,22 +9,25 @@ public class Stats : CoreComponent {
     
     [SerializeField] private float maxHealth;
     private float currentHealth;
+    private bool isDead;
 
     public float MaxHealth => maxHealth;
     public float CurrentHealth => currentHealth;
     public float HealthPercent => maxHealth <= 0f ? 0f : currentHealth / maxHealth;
+    public bool IsDead => isDead;
 
     protected override void Awake()
     {
         base.Awake();
 
         currentHealth = maxHealth;
+        isDead = currentHealth <= 0f;
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
     public void DecreaseHealth(float amount)
     {
-        if (amount <= 0f || currentHealth <= 0f)
+        if (amount <= 0f || isDead)
         {
             return;
         }
@@ -34,21 +37,20 @@ public class Stats : CoreComponent {
         if(currentHealth <= 0)
         {
             currentHealth = 0;
+            isDead = true;
         }
 
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
 
-        if(currentHealth <= 0)
+        if(isDead)
         {
             OnHealthZero?.Invoke();
-            
-            Debug.Log("Health is zero!!");
         }
     }
 
     public void IncreaseHealth(float amount)
     {
-        if (amount <= 0f || currentHealth <= 0f)
+        if (amount <= 0f || isDead)
         {
             return;
         }

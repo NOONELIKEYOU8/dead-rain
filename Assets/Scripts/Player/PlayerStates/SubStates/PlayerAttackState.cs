@@ -31,6 +31,7 @@ public class PlayerAttackState : PlayerAbilityState
         }
 
         weapon.EnterWeapon();
+        player.SetBodyVisible(!weapon.HasVisibleBase());
     }
 
     public override void Exit()
@@ -41,11 +42,18 @@ public class PlayerAttackState : PlayerAbilityState
         {
             weapon.ExitWeapon();
         }
+
+        player.SetBodyVisible(!player.IsShieldHeld());
     }
 
     public override void LogicUpdate()
     {
         base.LogicUpdate();
+
+        if (weapon != null)
+        {
+            player.SetBodyVisible(!weapon.HasVisibleBase());
+        }
 
         xInput = player.InputHandler.NormInputX;
 

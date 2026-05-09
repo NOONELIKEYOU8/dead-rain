@@ -4,14 +4,37 @@ public class WorldHealthBarUI : MonoBehaviour
 {
     [SerializeField] private RectTransform rectTransform;
     [SerializeField] private Vector3 worldOffset = new Vector3(0f, 1.35f, 0f);
-    [SerializeField] private bool hideWhenFull = true;
+    [SerializeField] private bool hideWhenFull = false;
 
     private Transform target;
     private Stats stats;
     private Camera worldCamera;
 
+    private void Awake()
+    {
+        if (rectTransform == null)
+        {
+            rectTransform = GetComponent<RectTransform>();
+        }
+    }
+
+    public void Configure(bool hideAtFull, Vector3 offset)
+    {
+        hideWhenFull = hideAtFull;
+        worldOffset = offset;
+        if (rectTransform == null)
+        {
+            rectTransform = GetComponent<RectTransform>();
+        }
+    }
+
     public void Bind(Transform targetTransform, Stats targetStats, Camera camera)
     {
+        if (rectTransform == null)
+        {
+            rectTransform = GetComponent<RectTransform>();
+        }
+
         target = targetTransform;
         stats = targetStats;
         worldCamera = camera;
@@ -20,6 +43,11 @@ public class WorldHealthBarUI : MonoBehaviour
         {
             stats.OnHealthChanged += HandleHealthChanged;
             HandleHealthChanged(stats.CurrentHealth, stats.MaxHealth);
+        }
+
+        if (!hideWhenFull && stats != null && stats.CurrentHealth > 0f)
+        {
+            gameObject.SetActive(true);
         }
     }
 
@@ -37,6 +65,11 @@ public class WorldHealthBarUI : MonoBehaviour
         {
             gameObject.SetActive(false);
             return;
+        }
+
+        if (stats != null && stats.CurrentHealth > 0f && !gameObject.activeSelf)
+        {
+            gameObject.SetActive(!hideWhenFull || stats.CurrentHealth < stats.MaxHealth);
         }
 
         if (worldCamera == null)

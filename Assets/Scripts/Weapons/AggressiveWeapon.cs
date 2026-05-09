@@ -40,13 +40,32 @@ public class AggressiveWeapon : Weapon
 
         foreach (IDamageable item in detectedDamageables.ToList())
         {
+            if (item == null || item is MonoBehaviour behaviour && !behaviour.isActiveAndEnabled)
+            {
+                detectedDamageables.Remove(item);
+                continue;
+            }
+
             item.Damage(details.damageAmount);
         }
 
         foreach (IKnockbackable item in detectedKnockbackables.ToList())
         {
+            if (item == null || item is MonoBehaviour behaviour && !behaviour.isActiveAndEnabled)
+            {
+                detectedKnockbackables.Remove(item);
+                continue;
+            }
+
             item.Knockback(details.knockbackAngle, details.knockbackStrength, Movement.FacingDirection);
         }
+    }
+
+    public override void ExitWeapon()
+    {
+        base.ExitWeapon();
+        detectedDamageables.Clear();
+        detectedKnockbackables.Clear();
     }
 
     public void AddToDetected(Collider2D collision)

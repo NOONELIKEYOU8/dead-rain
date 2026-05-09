@@ -30,6 +30,8 @@ public static class GameUISceneInstaller
         scaler.referenceResolution = new Vector2(1920f, 1080f);
         scaler.matchWidthOrHeight = 0.5f;
 
+        ConfigureHudTextureImports();
+
         RectTransform playerHealth = EnsureRectChild(uiObject.transform, "Player Health");
         ConfigurePlayerHealth(playerHealth);
 
@@ -38,6 +40,9 @@ public static class GameUISceneInstaller
 
         RectTransform enemyRoot = EnsureRectChild(uiObject.transform, "Enemy Health Bars");
         ConfigureFullScreenRect(enemyRoot);
+
+        RectTransform deathOverlay = EnsureRectChild(uiObject.transform, "Death Overlay");
+        ConfigureDeathOverlay(deathOverlay);
 
         if (Object.FindObjectOfType<EventSystem>() == null)
         {
@@ -54,13 +59,12 @@ public static class GameUISceneInstaller
         rect.anchorMin = new Vector2(0f, 1f);
         rect.anchorMax = new Vector2(0f, 1f);
         rect.pivot = new Vector2(0f, 1f);
-        rect.anchoredPosition = new Vector2(24f, -24f);
-        rect.sizeDelta = new Vector2(360f, 64f);
+        rect.anchoredPosition = new Vector2(28f, -28f);
+        rect.sizeDelta = new Vector2(390f, 58f);
 
-        if (rect.GetComponent<UIHealthBar>() == null)
-        {
-            GameUIBootstrapper.CreateHealthBar(rect, "HP", new Color(0.75f, 0.08f, 0.11f, 1f), true);
-        }
+        ClearChildren(rect);
+        GameUIBootstrapper.CreateHealthBar(rect, "HP", new Color(0.7f, 0.04f, 0.08f, 1f), true);
+
     }
 
     private static void ConfigureWeaponHud(RectTransform rect)
@@ -68,8 +72,8 @@ public static class GameUISceneInstaller
         rect.anchorMin = new Vector2(0f, 0f);
         rect.anchorMax = new Vector2(0f, 0f);
         rect.pivot = new Vector2(0f, 0f);
-        rect.anchoredPosition = new Vector2(24f, 24f);
-        rect.sizeDelta = new Vector2(620f, 52f);
+        rect.anchoredPosition = new Vector2(28f, 26f);
+        rect.sizeDelta = new Vector2(680f, 58f);
 
         HorizontalLayoutGroup layout = EnsureComponent<HorizontalLayoutGroup>(rect.gameObject);
         layout.spacing = 8f;
@@ -77,13 +81,15 @@ public static class GameUISceneInstaller
         layout.childForceExpandHeight = false;
         layout.childAlignment = TextAnchor.MiddleLeft;
 
+        Image backgroundArt = EnsureComponent<Image>(rect.gameObject);
+        backgroundArt.sprite = null;
+        backgroundArt.color = new Color(0f, 0f, 0f, 0f);
+        backgroundArt.raycastTarget = false;
+
         WeaponHUD hud = EnsureComponent<WeaponHUD>(rect.gameObject);
         hud.Configure(rect);
 
-        for (int i = rect.childCount - 1; i >= 0; i--)
-        {
-            Object.DestroyImmediate(rect.GetChild(i).gameObject);
-        }
+        ClearChildren(rect);
 
         PlayerInventory inventory = Object.FindObjectOfType<PlayerInventory>();
         if (inventory != null && inventory.weapons != null)
@@ -94,14 +100,15 @@ public static class GameUISceneInstaller
                 if (weapon != null && weapon != inventory.GetShield())
                 {
                     Color color = i == inventory.PrimaryWeaponIndex
-                        ? new Color(0.95f, 0.85f, 0.45f, 1f)
-                        : new Color(0.12f, 0.13f, 0.16f, 0.9f);
-                    CreatePreviewSlot(rect, (i + 1).ToString(), weapon.name, color);
+                        ? new Color(0.78f, 0.62f, 0.27f, 0.98f)
+                        : new Color(0.055f, 0.065f, 0.075f, 0.94f);
+                    Sprite sprite = i == inventory.PrimaryWeaponIndex ? LoadSprite("WeaponSlotSelected") : LoadSprite("WeaponSlot");
+                    CreatePreviewSlot(rect, (i + 1).ToString(), weapon.name, color, sprite);
                 }
             }
         }
 
-        CreatePreviewSlot(rect, "R", "Shield", new Color(0.25f, 0.45f, 0.9f, 0.9f));
+        CreatePreviewSlot(rect, "R", "Shield", new Color(0.09f, 0.27f, 0.45f, 0.95f), LoadSprite("ShieldSlot"));
     }
 
     private static void ConfigureFullScreenRect(RectTransform rect)
@@ -110,6 +117,66 @@ public static class GameUISceneInstaller
         rect.anchorMax = Vector2.one;
         rect.offsetMin = Vector2.zero;
         rect.offsetMax = Vector2.zero;
+    }
+
+    private static void ConfigureDeathOverlay(RectTransform rect)
+    {
+        ConfigureFullScreenRect(rect);
+
+        Image background = EnsureComponent<Image>(rect.gameObject);
+        background.color = new Color(0.02f, 0.01f, 0.01f, 0.72f);
+
+        PlayerDeathOverlayUI overlay = EnsureComponent<PlayerDeathOverlayUI>(rect.gameObject);
+
+        RectTransform messageRect = EnsureRectChild(rect, "Message");
+        messageRect.anchorMin = new Vector2(0.5f, 0.5f);
+        messageRect.anchorMax = new Vector2(0.5f, 0.5f);
+        messageRect.pivot = new Vector2(0.5f, 0.5f);
+        messageRect.anchoredPosition = Vector2.zero;
+        messageRect.sizeDelta = new Vector2(520f, 180f);
+
+        Text message = EnsureComponent<Text>(messageRect.gameObject);
+        message.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        message.fontSize = 38;
+        message.alignment = TextAnchor.MiddleCenter;
+        message.color = new Color(0.85f, 0.08f, 0.08f, 1f);
+        message.text = "YOU DIED\nPress R to restart";
+
+        Outline outline = EnsureComponent<Outline>(messageRect.gameObject);
+        outline.effectColor = Color.black;
+        outline.effectDistance = new Vector2(2f, -2f);
+
+        SetSerializedReference(overlay, "messageText", message);
+        rect.gameObject.SetActive(false);
+    }
+
+    private static void ConfigureHudTextureImports()
+    {
+        string[] paths =
+        {
+            "Assets/Sprites/UI/DeadRain_HUD_Green.png",
+            "Assets/Sprites/UI/DeadRain_HUD_Transparent.png",
+            "Assets/Resources/UI/PlayerHealthFrame.png",
+            "Assets/Resources/UI/EnemyHealthFrame.png",
+            "Assets/Resources/UI/WeaponSlot.png",
+            "Assets/Resources/UI/WeaponSlotSelected.png",
+            "Assets/Resources/UI/ShieldSlot.png"
+        };
+
+        foreach (string path in paths)
+        {
+            TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (importer == null)
+            {
+                continue;
+            }
+
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.alphaIsTransparency = true;
+            importer.mipmapEnabled = false;
+            importer.SaveAndReimport();
+        }
     }
 
     private static RectTransform EnsureRectChild(Transform parent, string childName)
@@ -131,7 +198,7 @@ public static class GameUISceneInstaller
         return component != null ? component : target.AddComponent<T>();
     }
 
-    private static void CreatePreviewSlot(Transform parent, string key, string label, Color color)
+    private static void CreatePreviewSlot(Transform parent, string key, string label, Color color, Sprite sprite)
     {
         GameObject slot = new GameObject($"{label} Slot", typeof(RectTransform), typeof(Image));
         slot.transform.SetParent(parent, false);
@@ -140,7 +207,12 @@ public static class GameUISceneInstaller
         rect.sizeDelta = new Vector2(86f, 44f);
 
         Image background = slot.GetComponent<Image>();
-        background.color = color;
+        background.sprite = sprite;
+        background.preserveAspect = false;
+        background.color = sprite != null ? Color.white : color;
+        Outline slotOutline = slot.AddComponent<Outline>();
+        slotOutline.effectColor = new Color(0.48f, 0.4f, 0.24f, 0.9f);
+        slotOutline.effectDistance = new Vector2(1f, -1f);
 
         CreateText(slot.transform, "Key", key, 16, TextAnchor.MiddleCenter, new Vector2(20f, 0f), new Vector2(28f, 32f));
         CreateText(slot.transform, "Label", label, 13, TextAnchor.MiddleLeft, new Vector2(54f, 0f), new Vector2(50f, 32f));
@@ -161,5 +233,27 @@ public static class GameUISceneInstaller
         uiText.fontSize = size;
         uiText.alignment = anchor;
         uiText.color = Color.white;
+        Outline outline = textObject.AddComponent<Outline>();
+        outline.effectColor = new Color(0f, 0f, 0f, 0.75f);
+        outline.effectDistance = new Vector2(1f, -1f);
+    }
+
+    private static Sprite LoadSprite(string name)
+    {
+        return AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Resources/UI/{name}.png");
+    }
+
+    private static void ClearChildren(Transform parent)
+    {
+        for (int i = parent.childCount - 1; i >= 0; i--)
+        {
+            Object.DestroyImmediate(parent.GetChild(i).gameObject);
+        }
+    }
+
+    private static void SetSerializedReference(Object target, string fieldName, Object value)
+    {
+        System.Reflection.FieldInfo field = target.GetType().GetField(fieldName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        field?.SetValue(target, value);
     }
 }

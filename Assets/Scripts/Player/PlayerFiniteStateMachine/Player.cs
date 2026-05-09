@@ -42,6 +42,7 @@ public class Player : MonoBehaviour
     private Vector2 workspace;
     private int inventoryVersion = -1;
     private bool wasShieldHeld;
+    private SpriteRenderer[] bodyRenderers;
     #endregion
 
     #region Unity Callback Functions
@@ -76,6 +77,7 @@ public class Player : MonoBehaviour
         DashDirectionIndicator = transform.Find("DashDirectionIndicator");
         MovementCollider = GetComponent<BoxCollider2D>();
         Inventory = GetComponent<PlayerInventory>();
+        bodyRenderers = GetComponentsInChildren<SpriteRenderer>(true);
 
         RefreshEquippedWeapons();
 
@@ -123,6 +125,11 @@ public class Player : MonoBehaviour
             return;
         }
 
+        if (StateMachine != null && (StateMachine.CurrentState == PrimaryAttackState || StateMachine.CurrentState == SecondaryAttackState))
+        {
+            return;
+        }
+
         PrimaryAttackState.SetWeapon(Inventory.GetWeapon(CombatInputs.primary));
         SecondaryAttackState.SetWeapon(Inventory.GetWeapon(CombatInputs.sencondary));
         inventoryVersion = Inventory.Version;
@@ -142,7 +149,36 @@ public class Player : MonoBehaviour
         }
 
         Inventory.GetShield().SetBlocking(isShieldHeld);
+        SetBodyVisible(!isShieldHeld && !IsInAttackState());
         wasShieldHeld = isShieldHeld;
+    }
+
+    public void SetBodyVisible(bool value)
+    {
+        if (bodyRenderers == null)
+        {
+            return;
+        }
+
+        foreach (SpriteRenderer spriteRenderer in bodyRenderers)
+        {
+            if (spriteRenderer == null || spriteRenderer.GetComponentInParent<Weapon>() != null)
+            {
+                continue;
+            }
+
+            spriteRenderer.enabled = value;
+        }
+    }
+
+    public bool IsShieldHeld()
+    {
+        return wasShieldHeld;
+    }
+
+    public bool IsInAttackState()
+    {
+        return StateMachine != null && (StateMachine.CurrentState == PrimaryAttackState || StateMachine.CurrentState == SecondaryAttackState);
     }
 
     #endregion

@@ -88,6 +88,7 @@ public class GameUIBootstrapper : MonoBehaviour
 
         UIHealthBar healthBar = EnsureHealthBar(healthRoot, "HP", new Color(0.75f, 0.08f, 0.11f, 1f), true);
         healthBar.Bind(playerStats);
+        BindDeathOverlay(playerStats);
 
         GameObject weaponHudObject = FindChild(canvas.transform, "Weapon HUD");
         if (weaponHudObject == null)
@@ -122,6 +123,11 @@ public class GameUIBootstrapper : MonoBehaviour
     private void BuildEnemyHealthBars()
     {
         Transform enemyBarRoot = GetOrCreateEnemyBarRoot();
+        for (int i = enemyBarRoot.childCount - 1; i >= 0; i--)
+        {
+            Destroy(enemyBarRoot.GetChild(i).gameObject);
+        }
+
         Stats[] allStats = FindObjectsOfType<Stats>();
         foreach (Stats stats in allStats)
         {
@@ -131,17 +137,20 @@ public class GameUIBootstrapper : MonoBehaviour
                 continue;
             }
 
-            if (FindChild(enemyBarRoot, $"{owner.name} Health") != null)
-            {
-                continue;
-            }
-
             RectTransform barRoot = CreatePanel($"{owner.name} Health", enemyBarRoot, Vector2.zero, new Vector2(110f, 16f), TextAnchor.MiddleCenter);
             UIHealthBar healthBar = EnsureHealthBar(barRoot, string.Empty, new Color(0.85f, 0.16f, 0.13f, 1f), false);
             healthBar.Bind(stats);
 
-            WorldHealthBarUI worldBar = barRoot.gameObject.AddComponent<WorldHealthBarUI>();
+            WorldHealthBarUI worldBar = barRoot.GetComponent<WorldHealthBarUI>();
+            if (worldBar == null)
+            {
+                worldBar = barRoot.gameObject.AddComponent<WorldHealthBarUI>();
+            }
+
+            barRoot.gameObject.SetActive(true);
+            worldBar.Configure(false, new Vector3(0f, 1.35f, 0f));
             worldBar.Bind(owner, stats, worldCamera);
+            barRoot.gameObject.SetActive(true);
         }
     }
 
@@ -197,17 +206,35 @@ public class GameUIBootstrapper : MonoBehaviour
 
     public static UIHealthBar CreateHealthBar(RectTransform parent, string label, Color fillColor, bool showValue)
     {
+        GameObject frameObject = new GameObject("Frame", typeof(RectTransform), typeof(Image));
+        frameObject.transform.SetParent(parent, false);
+
+        RectTransform frameRect = (RectTransform)frameObject.transform;
+        frameRect.anchorMin = Vector2.zero;
+        frameRect.anchorMax = Vector2.one;
+        frameRect.offsetMin = Vector2.zero;
+        frameRect.offsetMax = Vector2.zero;
+
+        Image frame = frameObject.GetComponent<Image>();
+        Sprite frameSprite = Resources.Load<Sprite>(showValue ? "UI/PlayerHealthFrame" : "UI/EnemyHealthFrame");
+        frame.sprite = frameSprite;
+        frame.preserveAspect = false;
+        frame.color = showValue ? new Color(0.11f, 0.12f, 0.13f, 0.96f) : new Color(0.04f, 0.045f, 0.05f, 0.88f);
+        Outline frameOutline = frameObject.AddComponent<Outline>();
+        frameOutline.effectColor = showValue ? new Color(0.55f, 0.47f, 0.28f, 0.95f) : new Color(0.08f, 0.09f, 0.1f, 0.9f);
+        frameOutline.effectDistance = showValue ? new Vector2(2f, -2f) : new Vector2(1f, -1f);
+
         GameObject backgroundObject = new GameObject("Background", typeof(RectTransform), typeof(Image));
         backgroundObject.transform.SetParent(parent, false);
 
         RectTransform backgroundRect = (RectTransform)backgroundObject.transform;
         backgroundRect.anchorMin = Vector2.zero;
         backgroundRect.anchorMax = Vector2.one;
-        backgroundRect.offsetMin = Vector2.zero;
-        backgroundRect.offsetMax = Vector2.zero;
+        backgroundRect.offsetMin = showValue ? new Vector2(10f, 10f) : new Vector2(2f, 2f);
+        backgroundRect.offsetMax = showValue ? new Vector2(-10f, -10f) : new Vector2(-2f, -2f);
 
         Image background = backgroundObject.GetComponent<Image>();
-        background.color = new Color(0.04f, 0.045f, 0.055f, 0.88f);
+        background.color = new Color(0.015f, 0.018f, 0.022f, 0.92f);
 
         GameObject fillObject = new GameObject("Fill", typeof(RectTransform), typeof(Image));
         fillObject.transform.SetParent(backgroundObject.transform, false);
@@ -243,11 +270,70 @@ public class GameUIBootstrapper : MonoBehaviour
             valueText.alignment = TextAnchor.MiddleCenter;
             valueText.color = Color.white;
             valueText.text = label;
+            Outline textOutline = textObject.AddComponent<Outline>();
+            textOutline.effectColor = new Color(0f, 0f, 0f, 0.8f);
+            textOutline.effectDistance = new Vector2(1f, -1f);
         }
 
         UIHealthBar healthBar = parent.gameObject.AddComponent<UIHealthBar>();
         healthBar.Configure(fill, valueText);
         return healthBar;
+    }
+
+    private void BindDeathOverlay(Stats playerStats)
+    {
+        PlayerDeathOverlayUI overlay = GetOrCreateDeathOverlay();
+        overlay.Bind(playerStats);
+    }
+
+    private PlayerDeathOverlayUI GetOrCreateDeathOverlay()
+    {
+        GameObject overlayObject = FindChild(canvas.transform, "Death Overlay");
+        if (overlayObject == null)
+        {
+            overlayObject = new GameObject("Death Overlay", typeof(RectTransform), typeof(Image), typeof(PlayerDeathOverlayUI));
+            overlayObject.transform.SetParent(canvas.transform, false);
+        }
+
+        RectTransform rect = (RectTransform)overlayObject.transform;
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+
+        Image background = overlayObject.GetComponent<Image>();
+        background.color = new Color(0.02f, 0.01f, 0.01f, 0.72f);
+
+        Transform textTransform = overlayObject.transform.Find("Message");
+        Text message = textTransform != null ? textTransform.GetComponent<Text>() : null;
+        if (message == null)
+        {
+            GameObject textObject = new GameObject("Message", typeof(RectTransform), typeof(Text), typeof(Outline));
+            textObject.transform.SetParent(overlayObject.transform, false);
+
+            RectTransform textRect = (RectTransform)textObject.transform;
+            textRect.anchorMin = new Vector2(0.5f, 0.5f);
+            textRect.anchorMax = new Vector2(0.5f, 0.5f);
+            textRect.pivot = new Vector2(0.5f, 0.5f);
+            textRect.anchoredPosition = Vector2.zero;
+            textRect.sizeDelta = new Vector2(520f, 180f);
+
+            message = textObject.GetComponent<Text>();
+            message.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            message.fontSize = 38;
+            message.alignment = TextAnchor.MiddleCenter;
+            message.color = new Color(0.85f, 0.08f, 0.08f, 1f);
+            message.text = "YOU DIED\nPress R to restart";
+
+            Outline outline = textObject.GetComponent<Outline>();
+            outline.effectColor = Color.black;
+            outline.effectDistance = new Vector2(2f, -2f);
+        }
+
+        PlayerDeathOverlayUI overlay = overlayObject.GetComponent<PlayerDeathOverlayUI>();
+        SetSerializedReference(overlay, "messageText", message);
+        overlayObject.SetActive(false);
+        return overlay;
     }
 
     private Transform GetOrCreateEnemyBarRoot()
@@ -288,5 +374,11 @@ public class GameUIBootstrapper : MonoBehaviour
         }
 
         return null;
+    }
+
+    private static void SetSerializedReference(Object target, string fieldName, Object value)
+    {
+        System.Reflection.FieldInfo field = target.GetType().GetField(fieldName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        field?.SetValue(target, value);
     }
 }

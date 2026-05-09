@@ -13,6 +13,16 @@ public class WeaponHUD : MonoBehaviour
     private PlayerInventory inventory;
     private PlayerInputHandler inputHandler;
     private Image shieldBackground;
+    private Sprite normalSlotSprite;
+    private Sprite selectedSlotSprite;
+    private Sprite shieldSlotSprite;
+
+    private void Awake()
+    {
+        normalSlotSprite = Resources.Load<Sprite>("UI/WeaponSlot");
+        selectedSlotSprite = Resources.Load<Sprite>("UI/WeaponSlotSelected");
+        shieldSlotSprite = Resources.Load<Sprite>("UI/ShieldSlot");
+    }
 
     public void Configure(Transform slots)
     {
@@ -86,7 +96,10 @@ public class WeaponHUD : MonoBehaviour
             return;
         }
 
-        shieldBackground.color = inputHandler.SecondaryAttackHeld ? selectedColor : shieldColor;
+        shieldBackground.sprite = inputHandler.SecondaryAttackHeld ? selectedSlotSprite : shieldSlotSprite;
+        shieldBackground.color = shieldBackground.sprite != null
+            ? Color.white
+            : inputHandler.SecondaryAttackHeld ? selectedColor : shieldColor;
     }
 
     private void Refresh()
@@ -108,7 +121,9 @@ public class WeaponHUD : MonoBehaviour
 
             if (visibleIndex < slotBackgrounds.Count)
             {
-                slotBackgrounds[visibleIndex].color = i == inventory.PrimaryWeaponIndex ? selectedColor : normalColor;
+                bool selected = i == inventory.PrimaryWeaponIndex;
+                slotBackgrounds[visibleIndex].sprite = selected ? selectedSlotSprite : normalSlotSprite;
+                slotBackgrounds[visibleIndex].color = selected ? Color.white : Color.white;
             }
 
             visibleIndex++;
@@ -121,14 +136,19 @@ public class WeaponHUD : MonoBehaviour
         slot.transform.SetParent(slotRoot, false);
 
         RectTransform slotRect = (RectTransform)slot.transform;
-        slotRect.sizeDelta = new Vector2(86f, 44f);
+        slotRect.sizeDelta = new Vector2(92f, 48f);
 
         Image background = slot.GetComponent<Image>();
-        background.color = color;
+        background.sprite = label == "Shield" ? shieldSlotSprite : normalSlotSprite;
+        background.preserveAspect = false;
+        background.color = background.sprite != null ? Color.white : color;
+        Outline outline = slot.AddComponent<Outline>();
+        outline.effectColor = new Color(0.55f, 0.47f, 0.28f, 0.8f);
+        outline.effectDistance = new Vector2(1f, -1f);
         slotBackgrounds.Add(background);
 
-        CreateText(slot.transform, "Key", key, 16, TextAnchor.MiddleCenter, new Vector2(20f, 0f), new Vector2(28f, 32f));
-        CreateText(slot.transform, "Label", label, 13, TextAnchor.MiddleLeft, new Vector2(54f, 0f), new Vector2(50f, 32f));
+        CreateText(slot.transform, "Key", key, 16, TextAnchor.MiddleCenter, new Vector2(18f, 0f), new Vector2(26f, 34f));
+        CreateText(slot.transform, "Label", label, 13, TextAnchor.MiddleLeft, new Vector2(56f, 0f), new Vector2(54f, 34f));
 
         return background;
     }
@@ -148,5 +168,8 @@ public class WeaponHUD : MonoBehaviour
         uiText.fontSize = size;
         uiText.alignment = anchor;
         uiText.color = Color.white;
+        Outline outline = textObject.AddComponent<Outline>();
+        outline.effectColor = new Color(0f, 0f, 0f, 0.75f);
+        outline.effectDistance = new Vector2(1f, -1f);
     }
 }

@@ -14,11 +14,13 @@ public class Weapon : MonoBehaviour
     protected Core core;
 
     protected int attackCounter;
+    private SpriteRenderer baseRenderer;
 
     protected virtual void Awake()
     {
         baseAnimator = transform.Find("Base").GetComponent<Animator>();
         weaponAnimator = transform.Find("Weapon").GetComponent<Animator>();
+        baseRenderer = transform.Find("Base").GetComponent<SpriteRenderer>();
 
         gameObject.SetActive(false);
     }
@@ -37,6 +39,14 @@ public class Weapon : MonoBehaviour
 
         baseAnimator.SetInteger("attackCounter", attackCounter);
         weaponAnimator.SetInteger("attackCounter", attackCounter);
+    }
+
+    public bool HasVisibleBase()
+    {
+        return gameObject.activeInHierarchy
+            && baseRenderer != null
+            && baseRenderer.enabled
+            && baseRenderer.sprite != null;
     }
 
     public virtual void ExitWeapon()

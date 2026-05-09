@@ -47,7 +47,9 @@ public class EditorHelper : MonoBehaviour
                 }
             }
 
+#pragma warning disable 0618
             ti.spritesheet = newData.ToArray();
+#pragma warning restore 0618
             AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
         }
         Debug.Log("Done Slicing!");

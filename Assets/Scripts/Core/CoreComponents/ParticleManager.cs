@@ -8,11 +8,17 @@ public class ParticleManager : CoreComponent
     {
         base.Awake();
 
-        particleContainer = GameObject.FindGameObjectWithTag("ParticleContainer").transform;
+        GameObject containerObject = GameObject.FindGameObjectWithTag("ParticleContainer");
+        particleContainer = containerObject != null ? containerObject.transform : transform;
     }
 
     public GameObject StartParticles(GameObject particlePrefab,Vector2 position,Quaternion rotation)
     {
+        if (particlePrefab == null)
+        {
+            return null;
+        }
+
         return Instantiate(particlePrefab, position, rotation,particleContainer);
     }
 
