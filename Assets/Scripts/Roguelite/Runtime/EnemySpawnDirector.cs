@@ -5,6 +5,7 @@ public class EnemySpawnDirector : MonoBehaviour
 {
     [SerializeField] private EraStageSystem eraStageSystem;
     [SerializeField] private BronzeMapGenerator mapGenerator;
+    [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
     [SerializeField] private Transform[] spawnPoints;
     [SerializeField] private bool spawnAutomatically = true;
     [SerializeField] private int initialSpawnCount = 3;
@@ -16,6 +17,11 @@ public class EnemySpawnDirector : MonoBehaviour
 
     private void Start()
     {
+        if ((spawnPoints == null || spawnPoints.Length == 0) && proceduralMapGenerator != null)
+        {
+            spawnPoints = proceduralMapGenerator.GetSpawnPointArray();
+        }
+
         if ((spawnPoints == null || spawnPoints.Length == 0) && mapGenerator != null)
         {
             spawnPoints = mapGenerator.GetSpawnPointArray();

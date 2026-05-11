@@ -26,6 +26,10 @@ public class GameRunManager : MonoBehaviour
     public float EliteChance => difficultyService.GetEliteChance(ElapsedTime);
     public float DropChance => difficultyService.GetDropChance(ElapsedTime, ClearedEraCount);
     public float SpawnInterval => difficultyService.GetSpawnInterval(ElapsedTime, ClearedEraCount);
+    public int SpawnBudget => difficultyService.GetSpawnBudget(ElapsedTime, ClearedEraCount);
+    public float EnemyDamageMultiplier => difficultyService.GetEnemyDamageMultiplier(ElapsedTime, ClearedEraCount);
+    public float EnemyHealthMultiplier => difficultyService.GetEnemyHealthMultiplier(ElapsedTime, ClearedEraCount);
+    public BossTriggerCondition BossTriggerCondition => difficultyService.BossTriggerCondition;
     public int MaxAliveEnemies => difficultyService.MaxAliveEnemies;
 
     private void Awake()

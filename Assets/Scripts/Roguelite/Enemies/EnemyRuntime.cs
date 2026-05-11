@@ -128,11 +128,13 @@ public class EnemyRuntime : MonoBehaviour, IDamageable, IKnockbackable
         initialized = true;
 
         float baseHp = data != null ? data.hp : 30f;
-        scaledDamage = (data != null ? data.damage : 8f) * difficultyMultiplier * (elite ? 1.35f : 1f);
+        float eliteDamageMultiplier = data != null ? data.eliteDamageMultiplier : 1.35f;
+        float eliteHealthMultiplier = data != null ? data.eliteHealthMultiplier : 1.6f;
+        scaledDamage = (data != null ? data.damage : 8f) * difficultyMultiplier * (elite ? eliteDamageMultiplier : 1f);
 
         if (stats != null)
         {
-            stats.SetMaxHealth(baseHp * difficultyMultiplier * (elite ? 1.6f : 1f), true);
+            stats.SetMaxHealth(baseHp * difficultyMultiplier * (elite ? eliteHealthMultiplier : 1f), true);
         }
 
         if (spriteRenderer != null && elite)

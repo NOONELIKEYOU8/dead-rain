@@ -16,11 +16,16 @@ public class ItemData : ScriptableObject
     public float stackValue;
     public float maxValue;
     public float triggerCooldown;
+    public ItemTriggerEvent triggerEvents = ItemTriggerEvent.Passive;
+    public bool repeatable = true;
 
     [Header("Common Data Fields")]
     public float hp;
     public float damage;
     public float moveSpeed;
+    public float defense;
+    public float critChance;
+    public float cooldownReduction;
     public EnemyAttackPattern attackPattern;
     public string prefabPathPlaceholder;
     public Sprite iconPlaceholder;

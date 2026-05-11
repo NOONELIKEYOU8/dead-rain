@@ -32,12 +32,21 @@ public class PlayerDashState : PlayerAbilityState
         Time.timeScale = playerData.holdTimeScale;
         startTime = Time.unscaledTime;
 
-        player.DashDirectionIndicator.gameObject.SetActive(true);
+        if (player.DashDirectionIndicator != null)
+        {
+            player.DashDirectionIndicator.gameObject.SetActive(true);
+        }
     }
 
     public override void Exit()
     {
         base.Exit();
+
+        Time.timeScale = 1f;
+        if (player.DashDirectionIndicator != null)
+        {
+            player.DashDirectionIndicator.gameObject.SetActive(false);
+        }
 
         if (Movement.CurrentVelocity.y > 0)
         {
@@ -66,7 +75,10 @@ public class PlayerDashState : PlayerAbilityState
                 }
 
                 float angle = Vector2.SignedAngle(Vector2.right, dashDirection);
-                player.DashDirectionIndicator.rotation = Quaternion.Euler(0f, 0f, angle - 45);
+                if (player.DashDirectionIndicator != null)
+                {
+                    player.DashDirectionIndicator.rotation = Quaternion.Euler(0f, 0f, angle - 45);
+                }
 
                 if (dashInputStop || Time.unscaledTime >= startTime + playerData.maxHoldTime)
                 {
@@ -76,7 +88,10 @@ public class PlayerDashState : PlayerAbilityState
                     Movement.CheckIfShouldFlip(Mathf.RoundToInt(dashDirection.x));
                     player.RB.drag = playerData.drag;
                     Movement.SetVelocity(playerData.dashVelocity, dashDirection);
-                    player.DashDirectionIndicator.gameObject.SetActive(false);
+                    if (player.DashDirectionIndicator != null)
+                    {
+                        player.DashDirectionIndicator.gameObject.SetActive(false);
+                    }
                     PlaceAfterImage();
                 }
             }
@@ -105,7 +120,11 @@ public class PlayerDashState : PlayerAbilityState
 
     private void PlaceAfterImage()
     {
-        PlayerAfterImagePool.Instance.GetFromPool();
+        if (PlayerAfterImagePool.Instance != null)
+        {
+            PlayerAfterImagePool.Instance.GetFromPool();
+        }
+
         lastAIPos = player.transform.position;
     }
 

@@ -20,6 +20,9 @@ public class DifficultyScalingData : ScriptableObject
     public float minSpawnInterval = 1.4f;
     public float spawnIntervalDifficultyFactor = 0.08f;
     public int maxAliveEnemies = 8;
+    public int baseSpawnBudget = 3;
+    public float spawnBudgetPerMinute = 0.75f;
+    public int maxSpawnBudget = 18;
 
     [Header("Elite And Drops")]
     public float baseEliteChance = 0.02f;
@@ -28,6 +31,15 @@ public class DifficultyScalingData : ScriptableObject
     public float baseDropChance = 0.12f;
     public float dropChanceDifficultyBonus = 0.01f;
     public float maxDropChance = 0.45f;
+
+    [Header("Enemy Scaling")]
+    public float enemyDamageMultiplierPerDifficulty = 0.08f;
+    public float enemyHealthMultiplierPerDifficulty = 0.12f;
+
+    [Header("Boss Trigger")]
+    public BossTriggerCondition bossTriggerCondition = BossTriggerCondition.KillCount;
+    public int bossKillCountThreshold = 6;
+    public float bossElapsedTimeThreshold = 240f;
 
     [Header("Common Data Fields")]
     public float hp;

@@ -5,10 +5,12 @@ public class RunFlowController : MonoBehaviour
     [SerializeField] private EnemySpawnDirector spawnDirector;
     [SerializeField] private EraStageSystem eraStageSystem;
     [SerializeField] private BronzeMapGenerator mapGenerator;
+    [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
     [SerializeField] private BossBase bronzeBossPrefab;
     [SerializeField] private Transform bossSpawnPoint;
     [SerializeField] private RunRewardTableData rewardTable;
     [SerializeField] private RunRewardChoiceUI rewardChoiceUI;
+    [SerializeField] private bool spawnBossByKillCount = true;
     [SerializeField] private int killsBeforeBoss = 6;
     [SerializeField] private GameObject nextEraPortal;
 
@@ -16,6 +18,8 @@ public class RunFlowController : MonoBehaviour
     private bool rewardsShown;
     private BossBase activeBoss;
     private bool subscribed;
+
+    public bool IsBossDefeated => rewardsShown;
 
     private void OnEnable()
     {
@@ -31,12 +35,21 @@ public class RunFlowController : MonoBehaviour
             nextEraPortal.SetActive(false);
         }
 
+        if (bossSpawnPoint == null && proceduralMapGenerator != null)
+        {
+            bossSpawnPoint = proceduralMapGenerator.BossSpawnPoint;
+        }
+
         if (bossSpawnPoint == null && mapGenerator != null)
         {
             bossSpawnPoint = mapGenerator.BossSpawnPoint;
         }
 
-        if (nextEraPortal != null && mapGenerator != null && mapGenerator.PortalPoint != null)
+        if (nextEraPortal != null && proceduralMapGenerator != null && proceduralMapGenerator.PortalPoint != null)
+        {
+            nextEraPortal.transform.position = proceduralMapGenerator.PortalPoint.position;
+        }
+        else if (nextEraPortal != null && mapGenerator != null && mapGenerator.PortalPoint != null)
         {
             nextEraPortal.transform.position = mapGenerator.PortalPoint.position;
         }
@@ -71,12 +84,28 @@ public class RunFlowController : MonoBehaviour
 
     private void CheckProgress()
     {
-        if (bossSpawned || GameRunManager.Instance == null || GameRunManager.Instance.KillCount < killsBeforeBoss)
+        if (!spawnBossByKillCount || bossSpawned || GameRunManager.Instance == null || GameRunManager.Instance.KillCount < killsBeforeBoss)
         {
             return;
         }
 
         SpawnBoss();
+    }
+
+    public bool TrySpawnBossFromAltar(BossAltar altar)
+    {
+        if (bossSpawned)
+        {
+            return false;
+        }
+
+        if (altar != null)
+        {
+            bossSpawnPoint = altar.BossSpawnPoint;
+        }
+
+        SpawnBoss();
+        return bossSpawned;
     }
 
     private void SpawnBoss()
@@ -120,6 +149,15 @@ public class RunFlowController : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         RunInventorySystem inventory = player != null ? player.GetComponent<RunInventorySystem>() : null;
         inventory?.AddItem(item);
+    }
+
+    public void EnterNextEra()
+    {
+        if (!rewardsShown)
+        {
+            return;
+        }
+
         eraStageSystem?.UnlockAndEnterNextEra();
     }
 }
